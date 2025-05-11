@@ -12,10 +12,14 @@ A secure JavaScript SDK for collecting payment information that helps maintain P
 
 ## Installation
 
-For production use, include RootPay directly from our CDN:
+For production use, include RootPay directly from the jsDelivr CDN:
 
 ```html
-<script src="https://cdn.rootpay.com/v1/rootpay.min.js"></script>
+<!-- Latest version -->
+<script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script>
+
+<!-- Specific version -->
+<script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@VERSION/rootpay.min.js"></script>
 ```
 
 ## Integration Guide
@@ -49,8 +53,8 @@ RootPay.init(options)
 - `options` (Object):
   - `token` (String): RootPay session token
   - `payee_id` (String): Payee ID
-  - `environment` (String): 'sandbox' or 'production'
-  - `apiBaseUrl` (String, optional): Override the API URL
+  - `apiBaseUrl` (String, optional): Override the API URL (default: 'http://localhost:8000')
+  - `debug` (Boolean, optional): Enable detailed logging (default: false)
   - `onSuccess` (Function): Callback for successful payment method creation
   - `onError` (Function): Callback for payment method creation errors
 
