@@ -113,6 +113,34 @@ rootpay.getFormState()
 - Set appropriate token TTL values
 - Never hardcode credentials in client-side code
 
+## Testing with RootPay Account
+
+To properly test the SDK with the demo implementation, follow these steps:
+
+## Testing Demo
+
+We provide a sample integration demo `index.html` file that you can use to test the SDK with your RootPay account:
+
+### Prerequisites for Testing
+
+1. You must have a RootPay account to use the demo
+2. You need a valid session token from your backend (see "Testing with RootPay Account" section above)
+3. You need your payee ID from the RootPay platform
+
+### Using the Demo
+
+1. Download both `rootpay.min.js` and `index.html` from the distribution package
+2. Place both files in the same directory
+3. Open `index.html` in a web browser
+4. Enter your session token and payee ID in the form
+5. Click "Initialize Payment Form" to test the SDK
+6. You can test both card and bank account payment methods
+7. Try different themes to see UI customization options
+
+For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
+
+Refer to the "Testing with RootPay Account" section above and the official documentation at https://docs.root.credit for details on generating session tokens and verifying your test transactions.
+
 ## License
 
 MIT
