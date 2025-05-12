@@ -129,13 +129,12 @@ We provide a sample integration demo `index.html` file that you can use to test 
 
 ### Using the Demo
 
-1. Download both `rootpay.min.js` and `index.html` from the distribution package
-2. Place both files in the same directory
-3. Open `index.html` in a web browser
+1. Download `styles.css` and `index.html` from the distribution package
+2. Place these files in a directory
+3. Open `index.html` in a web browser (the script loads automatically from CDN)
 4. Enter your session token and payee ID in the form
 5. Click "Initialize Payment Form" to test the SDK
 6. You can test both card and bank account payment methods
-7. Try different themes to see UI customization options
 
 For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
 
