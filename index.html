@@ -4,236 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RootPay Integration</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    
-    .container {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-    }
-    
-    h1 {
-      color: #333;
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-    
-    h2 {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #555;
-    }
-    
-    input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    
-    .field-container {
-      height: 40px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background-color: white;
-      overflow: hidden;
-      transition: border-color 0.2s ease;
-      display: flex;
-      align-items: center;
-    }
-    
-    .field-container:focus-within {
-      border-color: #4CAF50;
-      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
-    }
-    
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 12px 20px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    
-    button:hover {
-      background-color: #43a047;
-    }
-    
-    .button-secondary {
-      background-color: #f1f1f1;
-      color: #333;
-      margin-right: 10px;
-    }
-    
-    .button-secondary:hover {
-      background-color: #e0e0e0;
-    }
-    
-    .status {
-      margin-top: 20px;
-      padding: 12px 16px;
-      border-radius: 4px;
-      font-weight: 500;
-      display: none;
-    }
-    
-    .success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border-left: 4px solid #4CAF50;
-    }
-    
-    .error {
-      background-color: #ffebee;
-      color: #c62828;
-      border-left: 4px solid #f44336;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    /* Initialize form styles */
-    #setup-form {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-    
-    /* Add a bit of spacing for demo purposes */
-    .demo-notice {
-      margin-top: 40px;
-      padding: 20px;
-      background-color: #e8f5e9;
-      border-radius: 4px;
-      font-size: 14px;
-      color: #333;
-      border-left: 4px solid #4CAF50;
-    }
-    
-    .demo-notice h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: #2e7d32;
-    }
-    
-    .demo-notice ol {
-      margin-left: 20px;
-      padding-left: 0;
-    }
-    
-    .demo-notice li {
-      margin-bottom: 5px;
-    }
-    
-    .demo-notice p {
-      margin-bottom: 10px;
-    }
-    
-    .demo-notice a {
-      color: #2e7d32;
-      text-decoration: underline;
-    }
-    
-    /* Theme selector */
-    .theme-selector {
-      margin-top: 30px;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-    
-    .theme-selector h3 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-size: 16px;
-      color: #666;
-    }
-    
-    .theme-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    .theme-button {
-      flex: 1;
-      min-width: 100px;
-      padding: 8px 12px;
-      background-color: #fff;
-      color: #333;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .theme-button:hover {
-      background-color: #f1f1f1;
-    }
-    
-    .theme-button.active {
-      background-color: #4CAF50;
-      color: white;
-      border-color: #4CAF50;
-    }
-    
-    #card-number-container, #card-expiry-container, #account-number-container, #routing-number-container {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    
-    .response-details {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 4px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      display: none;
-      overflow-x: auto;
-      max-height: 300px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    
-    .response-details.error {
-      background-color: #feecf0;
-      border-color: #f8d7da;
-    }
-    
-    .response-details.success {
-      background-color: #e8f5e9;
-      border-color: #c8e6c9;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
@@ -289,7 +60,7 @@
         </div>
       </div>
       
-      <button id="payment-button">Submit Payment Method</button>
+      <button id="payment-button" disabled>Submit Payment Method</button>
       
       <div id="payment-status" class="status"></div>
       <div id="response-details" class="response-details"></div>
@@ -304,123 +75,236 @@
         <li>You need a specific payee ID from your RootPay account</li>
         <li>Generate a session token using the token endpoint (see documentation at <a href="https://docs.root.credit" target="_blank">docs.root.credit</a>)</li>
       </ol>
-      <p><strong>Test Card:</strong> For testing, you can use card number 4111 1111 1111 1111 with any expiry date in the future.</p>
-      <p><strong>Verification:</strong> Check your RootPay account dashboard or use the List Payment Methods API to verify added payment methods.</p>
-      <p><strong>Note:</strong> This demo uses the production API URL by default (<code>https://api.root.credit</code>). If you need to use a different API URL, you can directly specify it in the initialization code:</p>
-      <pre style="background:#f5f5f5;padding:8px;border-radius:4px;font-size:12px;">
-RootPay.init({
-  token: "your_token",
-  payee_id: "your_payee_id",
-  apiBaseUrl: "https://your-custom-api-url.com"
-});
-      </pre>
-    </div>
-    
-    <!-- Theme Selector -->
-    <div class="theme-selector">
-      <h3>Try Different Themes</h3>
-      <div class="theme-buttons">
-        <button class="theme-button active" data-theme="default">Default</button>
-        <button class="theme-button" data-theme="dark">Dark Mode</button>
-        <button class="theme-button" data-theme="colorful">Colorful</button>
-        <button class="theme-button" data-theme="minimal">Minimal</button>
-      </div>
+      <p><strong>Test Values:</strong></p>
+      <ul>
+        <li><strong>Card:</strong> 4111 1111 1111 1111 with any future expiry date</li>
+        <li><strong>Account Number:</strong> 1234567890</li>
+        <li><strong>Routing Number:</strong> 111000025</li>
+      </ul>
     </div>
   </div>
   
   <!-- Include the RootPay SDK -->
-  <!-- Script tag selection - will work in both dev and distribution environments -->
+  <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script>
+  
   <script>
-    // Dynamically select the appropriate script based on environment
-    (function() {
-      const scriptElement = document.createElement('script');
+    // ===================================================
+    // DOM ELEMENTS & STATE
+    // ===================================================
+    
+    // Elements
+    const elements = {
+      setupForm: document.getElementById('setup-form'),
+      mainUi: document.getElementById('main-ui'),
+      tokenInput: document.getElementById('token'),
+      payeeIdInput: document.getElementById('payee-id'),
+      initializeBtn: document.getElementById('initialize-btn'),
+      paymentButton: document.getElementById('payment-button'),
+      paymentStatus: document.getElementById('payment-status'),
+      responseDetails: document.getElementById('response-details'),
+      cardFields: document.getElementById('card-fields'),
+      bankFields: document.getElementById('bank-fields')
+    };
+    
+    // State
+    const state = {
+      rootpay: null,
+      fields: {
+        cardNumber: null,
+        cardExpiry: null,
+        accountNumber: null,
+        routingNumber: null
+      },
+      paymentType: 'card',
+      validation: {
+        cardNumber: false,
+        cardExpiry: false,
+        accountNumber: false,
+        routingNumber: false
+      }
+    };
+    
+    // ===================================================
+    // DEFAULT FIELD STYLES
+    // ===================================================
+    
+    const defaultStyles = {
+      cardNumber: {
+        fontSize: '18px',
+        fontWeight: '500',
+        color: '#333',
+        letterSpacing: '1px'
+      },
+      cardExpiry: {
+        fontSize: '18px',
+        fontWeight: '500',
+        color: '#333'
+      }
+    };
+    
+    // ===================================================
+    // UI MANAGEMENT
+    // ===================================================
+    
+    /**
+     * Update submit button state based on validation
+     */
+    function updateSubmitButtonState() {
+      const isValid = state.paymentType === 'card'
+        ? (state.validation.cardNumber && state.validation.cardExpiry)
+        : (state.validation.accountNumber && state.validation.routingNumber);
       
-      // Try to load the local relative path first (for distribution package)
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // Development environment - use absolute path
-        scriptElement.src = '/dist/rootpay.min.js';
-      } else {
-        // Distribution environment - use relative path
-        scriptElement.src = './rootpay.min.js';
+      elements.paymentButton.disabled = !isValid;
+      elements.paymentButton.style.opacity = isValid ? '1' : '0.5';
+      elements.paymentButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
+      
+      console.log('Form validation:', isValid ? 'Valid' : 'Invalid');
+    }
+    
+    /**
+     * Show status message
+     */
+    function showStatus(message, type) {
+      elements.paymentStatus.textContent = message;
+      elements.paymentStatus.className = `status ${type}`;
+      elements.paymentStatus.style.display = 'block';
+      
+      // Auto-hide success messages
+      if (type === 'success') {
+        setTimeout(() => {
+          if (elements.paymentStatus.textContent === message) {
+            elements.paymentStatus.style.display = 'none';
+          }
+        }, 5000);
+      }
+    }
+    
+    /**
+     * Clear status message
+     */
+    function clearStatus() {
+      elements.paymentStatus.style.display = 'none';
+      elements.paymentStatus.textContent = '';
+      elements.paymentStatus.className = 'status';
+    }
+    
+    /**
+     * Format error details for display
+     */
+    function formatErrorDetails(response) {
+      if (typeof response !== 'object' || response === null) {
+        return JSON.stringify(response, null, 2);
       }
       
-      // Append the script to the document
-      document.head.appendChild(scriptElement);
-    })();
-  </script>
-  
-  <!-- Alternative script tags (commented out) for different deployment scenarios -->
-  <!-- <script src="./rootpay.min.js"></script> --> <!-- Local file (same directory) -->
-  <!-- <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script> --> <!-- CDN Latest version -->
-  <!-- <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@VERSION/rootpay.min.js"></script> --> <!-- CDN Specific version -->
-  
-  <script>
-    // DOM Elements
-    const setupForm = document.getElementById('setup-form');
-    const mainUi = document.getElementById('main-ui');
-    const tokenInput = document.getElementById('token');
-    const payeeIdInput = document.getElementById('payee-id');
-    const initializeBtn = document.getElementById('initialize-btn');
-    const paymentButton = document.getElementById('payment-button');
-    const paymentStatus = document.getElementById('payment-status');
-    const responseDetails = document.getElementById('response-details');
+      let result = '';
+      
+      if (response.status) {
+        result += `Status Code: ${response.status}\n\n`;
+      }
+      
+      if (response.error) {
+        result += `Error: ${response.error}\n\n`;
+      }
+      
+      if (response.details) {
+        result += 'Details:\n' + JSON.stringify(response.details, null, 2);
+      } else {
+        result += 'Full Response:\n' + JSON.stringify(response, null, 2);
+      }
+      
+      return result;
+    }
     
-    // RootPay instance
-    let rootpay = null;
-    let cardNumberField = null;
-    let cardExpiryField = null;
-    let accountNumberField = null;
-    let routingNumberField = null;
-    let currentPaymentType = 'card';
+    /**
+     * Display API response details
+     */
+    function displayResponseDetails(response, isSuccess) {
+      // Format and show the response
+      if (isSuccess) {
+        elements.responseDetails.textContent = JSON.stringify(response, null, 2);
+        elements.responseDetails.classList.remove('error');
+        elements.responseDetails.classList.add('success');
+      } else {
+        elements.responseDetails.textContent = formatErrorDetails(response);
+        elements.responseDetails.classList.remove('success');
+        elements.responseDetails.classList.add('error');
+      }
+      
+      elements.responseDetails.style.display = 'block';
+    }
     
-    // Payment method selector logic
-    document.querySelectorAll('input[name="payment-method-type"]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        currentPaymentType = this.value;
-        if (currentPaymentType === 'card') {
-          document.getElementById('card-fields').style.display = '';
-          document.getElementById('bank-fields').style.display = 'none';
-          // Create card fields if not already created
-          if (!cardNumberField) {
-            cardNumberField = rootpay.field('#card-number-container', {
-              type: 'card-number',
-              name: 'card-number',
-              style: themes.default.cardNumber
-            });
-          }
-          if (!cardExpiryField) {
-            cardExpiryField = rootpay.field('#card-expiry-container', {
-              type: 'card-expiry',
-              name: 'card-expiry',
-              style: themes.default.cardExpiry
-            });
-          }
-        } else {
-          document.getElementById('card-fields').style.display = 'none';
-          document.getElementById('bank-fields').style.display = '';
-          // Create bank fields if not already created
-          if (!accountNumberField) {
-            accountNumberField = rootpay.field('#account-number-container', {
-              type: 'account-number',
-              name: 'account-number',
-              style: themes.default.cardNumber
-            });
-          }
-          if (!routingNumberField) {
-            routingNumberField = rootpay.field('#routing-number-container', {
-              type: 'routing-number',
-              name: 'routing-number',
-              style: themes.default.cardExpiry
-            });
-          }
-        }
-      });
-    });
+    // ===================================================
+    // FIELD CREATION
+    // ===================================================
     
-    // Initialize RootPay
-    initializeBtn.addEventListener('click', function() {
-      const token = tokenInput.value.trim();
-      const payeeId = payeeIdInput.value.trim();
+    /**
+     * Create card payment fields
+     */
+    function createCardFields() {
+      if (!state.fields.cardNumber) {
+        state.fields.cardNumber = state.rootpay.field('#card-number-container', {
+          type: 'card-number',
+          name: 'card-number',
+          style: defaultStyles.cardNumber,
+          onValidChange: function(isValid) {
+            state.validation.cardNumber = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+      
+      if (!state.fields.cardExpiry) {
+        state.fields.cardExpiry = state.rootpay.field('#card-expiry-container', {
+          type: 'card-expiry',
+          name: 'card-expiry',
+          style: defaultStyles.cardExpiry,
+          onValidChange: function(isValid) {
+            state.validation.cardExpiry = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+    }
+    
+    /**
+     * Create bank payment fields
+     */
+    function createBankFields() {
+      if (!state.fields.accountNumber) {
+        state.fields.accountNumber = state.rootpay.field('#account-number-container', {
+          type: 'account-number',
+          name: 'account-number',
+          style: defaultStyles.cardNumber,
+          onValidChange: function(isValid) {
+            state.validation.accountNumber = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+      
+      if (!state.fields.routingNumber) {
+        state.fields.routingNumber = state.rootpay.field('#routing-number-container', {
+          type: 'routing-number',
+          name: 'routing-number',
+          style: defaultStyles.cardExpiry,
+          onValidChange: function(isValid) {
+            state.validation.routingNumber = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+    }
+    
+    // ===================================================
+    // EVENT HANDLERS
+    // ===================================================
+    
+    /**
+     * Initialize RootPay
+     */
+    function initializeRootPay() {
+      const token = elements.tokenInput.value.trim();
+      const payeeId = elements.payeeIdInput.value.trim();
       
       if (!token) {
         showStatus('Please enter a valid token', 'error');
@@ -433,308 +317,111 @@ RootPay.init({
       }
       
       try {
-        // Initialize RootPay
-        rootpay = RootPay.init({
+        // Initialize RootPay instance
+        state.rootpay = RootPay.init({
           token: token,
           payee_id: payeeId,
-          apiBaseUrl: 'https://api.root.credit',
           debug: true,
           onSuccess: function(response) {
             showStatus('Payment method added successfully!', 'success');
-            console.log('Success response:', response);
-            
-            // Display the response details
-            responseDetails.textContent = JSON.stringify(response, null, 2);
-            responseDetails.classList.remove('error');
-            responseDetails.classList.add('success');
-            responseDetails.style.display = 'block';
+            displayResponseDetails(response, true);
           },
           onError: function(errorMessage, errorDetails) {
-            // Show basic error message
             showStatus('Error: ' + errorMessage, 'error');
-            console.error('Error:', errorMessage, errorDetails);
-            
-            // Format and display detailed error information
-            responseDetails.textContent = formatErrorDetails(errorDetails);
-            responseDetails.classList.remove('success');
-            responseDetails.classList.add('error');
-            responseDetails.style.display = 'block';
+            displayResponseDetails(errorDetails, false);
           }
         });
         
-        // Initialize card fields by default
-        cardNumberField = rootpay.field('#card-number-container', {
-          type: 'card-number',
-          name: 'card-number',
-          style: themes.default.cardNumber
-        });
-        
-        cardExpiryField = rootpay.field('#card-expiry-container', {
-          type: 'card-expiry',
-          name: 'card-expiry',
-          style: themes.default.cardExpiry
-        });
+        // Create initial card fields
+        createCardFields();
         
         // Show main UI, hide setup form
-        setupForm.classList.add('hidden');
-        mainUi.classList.remove('hidden');
+        elements.setupForm.classList.add('hidden');
+        elements.mainUi.classList.remove('hidden');
         
-        // Apply default theme to the theme buttons
-        document.querySelector('.theme-button[data-theme="default"]').classList.add('active');
+        // Ensure button is initially disabled
+        elements.paymentButton.disabled = true;
+        elements.paymentButton.style.opacity = '0.5';
+        elements.paymentButton.style.cursor = 'not-allowed';
         
         console.log('RootPay initialized successfully');
       } catch (error) {
         showStatus('Error initializing RootPay: ' + error.message, 'error');
         console.error('Initialization error:', error);
       }
-    });
-    
-    // Format error details for display
-    function formatErrorDetails(response) {
-      // If it's not an object, return as is
-      if (typeof response !== 'object' || response === null) {
-        return JSON.stringify(response, null, 2);
-      }
-      
-      // Create a formatted display
-      let result = '';
-      
-      // Add status code if available
-      if (response.status) {
-        result += `Status Code: ${response.status}\n\n`;
-      }
-      
-      // Add error message if available
-      if (response.error) {
-        result += `Error: ${response.error}\n\n`;
-      }
-      
-      // Add details if available
-      if (response.details) {
-        result += 'Details:\n' + JSON.stringify(response.details, null, 2);
-      } else {
-        // If no specific details, show the whole response
-        result += 'Full Response:\n' + JSON.stringify(response, null, 2);
-      }
-      
-      return result;
     }
     
-    // Submit payment method
-    paymentButton.addEventListener('click', function() {
-      if (!rootpay) {
+    /**
+     * Handle payment method switch
+     */
+    function handlePaymentMethodSwitch(e) {
+      state.paymentType = e.target.value;
+      
+      if (state.paymentType === 'card') {
+        elements.cardFields.style.display = '';
+        elements.bankFields.style.display = 'none';
+        createCardFields();
+      } else {
+        elements.cardFields.style.display = 'none';
+        elements.bankFields.style.display = '';
+        createBankFields();
+      }
+      
+      updateSubmitButtonState();
+    }
+    
+    /**
+     * Submit payment method
+     */
+    function submitPaymentMethod() {
+      if (!state.rootpay) {
         showStatus('RootPay not initialized', 'error');
         return;
       }
       
-      clearStatus();
-      responseDetails.style.display = 'none';
-      responseDetails.textContent = '';
-      responseDetails.classList.remove('success', 'error');
+      if (elements.paymentButton.disabled) {
+        showStatus('Please fill in all required fields correctly', 'error');
+        return;
+      }
       
-      // Display loading indicator
+      clearStatus();
+      elements.responseDetails.style.display = 'none';
+      
       showStatus('Processing payment method...', 'info');
       
-      // Submit the payment method with the correct type
-      rootpay.submitPaymentMethod(function(status, response) {
+      state.rootpay.submitPaymentMethod(function(status, response) {
         console.log('Submission status:', status);
-        console.log('Response:', response);
         
         if (status === 201) {
           showStatus('Payment method added successfully!', 'success');
-          // Display the success response details
-          responseDetails.textContent = JSON.stringify(response, null, 2);
-          responseDetails.classList.remove('error');
-          responseDetails.classList.add('success');
-          responseDetails.style.display = 'block';
+          displayResponseDetails(response, true);
         } else {
-          // Extract error message and display with status code
           const errorMessage = response.error || 'Unknown error';
           const statusCode = response.status || status;
           showStatus(`Error ${statusCode}: ${errorMessage}`, 'error');
-          
-          // Display the formatted error details
-          responseDetails.textContent = formatErrorDetails(response);
-          responseDetails.classList.remove('success');
-          responseDetails.classList.add('error');
-          responseDetails.style.display = 'block';
+          displayResponseDetails(response, false);
         }
-      }, currentPaymentType);
-    });
-    
-    // Clear status message
-    function clearStatus() {
-      paymentStatus.style.display = 'none';
-      paymentStatus.textContent = '';
-      paymentStatus.className = 'status';
+      }, state.paymentType);
     }
     
-    // Show status message
-    function showStatus(message, type) {
-      paymentStatus.textContent = message;
-      paymentStatus.className = 'status ' + type;
-      paymentStatus.style.display = 'block';
+    // ===================================================
+    // EVENT LISTENERS
+    // ===================================================
+    
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ensure button is disabled initially
+      elements.paymentButton.disabled = true;
+      elements.paymentButton.style.opacity = '0.5';
+      elements.paymentButton.style.cursor = 'not-allowed';
       
-      // Auto hide success messages after 5 seconds
-      if (type === 'success') {
-        setTimeout(() => {
-          if (paymentStatus.textContent === message) {
-            paymentStatus.style.display = 'none';
-          }
-        }, 5000);
-      }
-    }
-    
-    // Add CSS for info status
-    document.head.insertAdjacentHTML('beforeend', `
-      <style>
-        .info {
-          background-color: #e3f2fd;
-          color: #0d47a1;
-          border-left: 4px solid #2196F3;
-        }
-      </style>
-    `);
-    
-    // Theme definitions
-    const themes = {
-      default: {
-        cardNumber: {
-          fontSize: '18px',
-          fontWeight: '500',
-          color: '#333',
-          letterSpacing: '1px'
-        },
-        cardExpiry: {
-          fontSize: '18px',
-          fontWeight: '500',
-          color: '#333'
-        }
-      },
-      dark: {
-        cardNumber: {
-          fontSize: '18px',
-          fontWeight: '500',
-          color: '#fff',
-          letterSpacing: '1px',
-          fontFamily: 'monospace',
-          textShadow: '0 0 2px rgba(255,255,255,0.5)'
-        },
-        cardExpiry: {
-          fontSize: '18px',
-          fontWeight: '500',
-          color: '#fff',
-          fontFamily: 'monospace',
-          textShadow: '0 0 2px rgba(255,255,255,0.5)'
-        }
-      },
-      colorful: {
-        cardNumber: {
-          fontSize: '18px',
-          fontWeight: 'bold',
-          color: '#2196F3',
-          letterSpacing: '2px',
-          fontFamily: 'Helvetica, Arial, sans-serif'
-        },
-        cardExpiry: {
-          fontSize: '18px',
-          fontWeight: 'bold',
-          color: '#E91E63',
-          fontFamily: 'Helvetica, Arial, sans-serif'
-        }
-      },
-      minimal: {
-        cardNumber: {
-          fontSize: '16px',
-          fontWeight: 'normal',
-          color: '#666',
-          letterSpacing: '0.5px',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        },
-        cardExpiry: {
-          fontSize: '16px',
-          fontWeight: 'normal',
-          color: '#666',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }
-      }
-    };
-    
-    // Apply theme when button is clicked
-    document.querySelectorAll('.theme-button').forEach(button => {
-      button.addEventListener('click', function() {
-        // Remove active class from all buttons
-        document.querySelectorAll('.theme-button').forEach(btn => btn.classList.remove('active'));
-        
-        // Add active class to clicked button
-        this.classList.add('active');
-        
-        // Get theme name
-        const themeName = this.getAttribute('data-theme');
-        const theme = themes[themeName];
-        
-        if (!rootpay) {
-          showStatus('Please initialize RootPay first', 'error');
-          return;
-        }
-        
-        // Apply theme styles to fields
-        if (cardNumberField) {
-          cardNumberField.update({
-            style: theme.cardNumber
-          });
-        }
-        
-        if (cardExpiryField) {
-          cardExpiryField.update({
-            style: theme.cardExpiry
-          });
-        }
-        
-        if (accountNumberField) {
-          accountNumberField.update({
-            style: theme.cardNumber
-          });
-        }
-        
-        if (routingNumberField) {
-          routingNumberField.update({
-            style: theme.cardExpiry
-          });
-        }
-        
-        // Also modify the field containers based on theme
-        if (themeName === 'dark') {
-          document.querySelectorAll('.field-container').forEach(container => {
-            container.style.backgroundColor = '#333';
-            container.style.borderColor = '#555';
-          });
-        } else if (themeName === 'colorful') {
-          document.querySelector('#card-number-container').style.borderColor = '#2196F3';
-          document.querySelector('#card-expiry-container').style.borderColor = '#E91E63';
-          if (document.querySelector('#account-number-container')) {
-            document.querySelector('#account-number-container').style.borderColor = '#2196F3';
-          }
-          if (document.querySelector('#routing-number-container')) {
-            document.querySelector('#routing-number-container').style.borderColor = '#E91E63';
-          }
-          document.querySelectorAll('.field-container').forEach(container => {
-            container.style.backgroundColor = '#fff';
-          });
-        } else if (themeName === 'minimal') {
-          document.querySelectorAll('.field-container').forEach(container => {
-            container.style.backgroundColor = '#f9f9f9';
-            container.style.borderColor = '#eee';
-          });
-        } else {
-          // Default theme
-          document.querySelectorAll('.field-container').forEach(container => {
-            container.style.backgroundColor = '#fff';
-            container.style.borderColor = '#ddd';
-          });
-        }
-        
-        showStatus(`Applied ${themeName} theme`, 'success');
+      // Set up event listeners
+      elements.initializeBtn.addEventListener('click', initializeRootPay);
+      elements.paymentButton.addEventListener('click', submitPaymentMethod);
+      
+      // Payment method selection
+      document.querySelectorAll('input[name="payment-method-type"]').forEach(radio => {
+        radio.addEventListener('change', handlePaymentMethodSwitch);
       });
     });
   </script>
