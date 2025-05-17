@@ -30,40 +30,55 @@
       <h2>Enter Payment Information</h2>
       
       <!-- Payment Method Selector -->
-      <div class="form-group">
-        <label>Payment Method:</label>
-        <label style="margin-right: 20px;"><input type="radio" name="payment-method-type" value="card" checked> Card</label>
-        <label><input type="radio" name="payment-method-type" value="bank"> Bank</label>
+      <div class="payment-form">
+        <div class="payment-type-selector">
+          <label>
+            <input type="radio" name="payment-method-type" value="card" checked> Credit/Debit Card
+          </label>
+          <label>
+            <input type="radio" name="payment-method-type" value="bank"> Bank Account
+          </label>
+        </div>
+
+        <div id="card-fields">
+          <label for="card-number-container">Card Number</label>
+          <div id="card-number-container" class="secure-field"></div>
+          <label for="card-expiry-container">Expiry Date</label>
+          <div id="card-expiry-container" class="secure-field"></div>
+        </div>
+
+        <div id="bank-fields" style="display: none;">
+          <label for="account-number-container">Account Number</label>
+          <div id="account-number-container" class="secure-field"></div>
+          <label for="routing-number-container">Routing Number</label>
+          <div id="routing-number-container" class="secure-field"></div>
+        </div>
+
+        <div class="field-container">
+          <label class="checkbox-label">
+            <input type="checkbox" id="set-as-default" name="set-as-default">
+            Set as default payment method
+          </label>
+        </div>
+
+        <button id="payment-button" class="submit-button" disabled>Add Payment Method</button>
       </div>
-      
-      <!-- Card Fields -->
-      <div id="card-fields">
-        <div class="form-group">
-          <label for="card-number-container">Card Number:</label>
-          <div id="card-number-container" class="field-container"></div>
-        </div>
-        <div class="form-group">
-          <label for="card-expiry-container">Expiration Date (MM/YY):</label>
-          <div id="card-expiry-container" class="field-container"></div>
-        </div>
-      </div>
-      
-      <!-- Bank Fields (initially hidden) -->
-      <div id="bank-fields" style="display:none;">
-        <div class="form-group">
-          <label for="account-number-container">Account Number:</label>
-          <div id="account-number-container" class="field-container"></div>
-        </div>
-        <div class="form-group">
-          <label for="routing-number-container">Routing Number:</label>
-          <div id="routing-number-container" class="field-container"></div>
-        </div>
-      </div>
-      
-      <button id="payment-button" disabled>Submit Payment Method</button>
       
       <div id="payment-status" class="status"></div>
       <div id="response-details" class="response-details"></div>
+      
+      <!-- Payment Methods Section (New) -->
+      <div id="payment-methods-section">
+        <h2>Saved Payment Methods</h2>
+        <div id="payment-methods-list" class="payment-methods-container">
+          <p>Loading payment methods...</p>
+        </div>
+        
+        <button id="refresh-payment-methods" class="refresh-button">Refresh Payment Methods</button>
+
+        <div id="payment-methods-status" class="status"></div>
+        
+      </div>
     </div>
     
     <div class="demo-notice">
@@ -103,7 +118,11 @@
       paymentStatus: document.getElementById('payment-status'),
       responseDetails: document.getElementById('response-details'),
       cardFields: document.getElementById('card-fields'),
-      bankFields: document.getElementById('bank-fields')
+      bankFields: document.getElementById('bank-fields'),
+      // Payment methods elements
+      paymentMethodsList: document.getElementById('payment-methods-list'),
+      refreshPaymentMethodsBtn: document.getElementById('refresh-payment-methods'),
+      paymentMethodsStatus: document.getElementById('payment-methods-status')
     };
     
     // State
@@ -121,7 +140,12 @@
         cardExpiry: false,
         accountNumber: false,
         routingNumber: false
-      }
+      },
+      refreshInProgress: false,
+      submitInProgress: false,
+      lastPaymentMethodsUpdate: 0,
+      initializing: false,
+      paymentMethodsInitialized: false
     };
     
     // ===================================================
@@ -174,6 +198,24 @@
         setTimeout(() => {
           if (elements.paymentStatus.textContent === message) {
             elements.paymentStatus.style.display = 'none';
+          }
+        }, 5000);
+      }
+    }
+    
+    /**
+     * Show status message in payment methods section
+     */
+    function showPaymentMethodsStatus(message, type) {
+      elements.paymentMethodsStatus.textContent = message;
+      elements.paymentMethodsStatus.className = `status ${type}`;
+      elements.paymentMethodsStatus.style.display = 'block';
+      
+      // Auto-hide success messages
+      if (type === 'success') {
+        setTimeout(() => {
+          if (elements.paymentMethodsStatus.textContent === message) {
+            elements.paymentMethodsStatus.style.display = 'none';
           }
         }, 5000);
       }
@@ -296,6 +338,193 @@
     }
     
     // ===================================================
+    // PAYMENT METHODS MANAGEMENT
+    // ===================================================
+    
+    /**
+     * Render payment methods
+     */
+    function renderPaymentMethods(paymentMethods) {
+      // Check if response contains data array
+      if (paymentMethods.data) {
+        paymentMethods = paymentMethods.data;
+      }
+      
+      if (!paymentMethods || paymentMethods.length === 0) {
+        elements.paymentMethodsList.innerHTML = '<p>No payment methods available.</p>';
+        return;
+      }
+      
+      let html = '';
+      
+      paymentMethods.forEach(method => {
+        let methodDetails = '';
+        let paymentType = '';
+        
+        // Determine payment method type from available fields
+        if (method.card_last_four) {
+          paymentType = 'card';
+          const expiry = method.card_expiry_date || '';
+          const expiryMonth = expiry.substring(0, 2);
+          const expiryYear = expiry.substring(2);
+          
+          methodDetails = `•••• ${method.card_last_four} (expires ${expiryMonth}/${expiryYear})`;
+        } 
+        else if (method.account_last_four) {
+          paymentType = 'bank';
+          methodDetails = `Account •••• ${method.account_last_four}`;
+          
+          if (method.routing_number) {
+            methodDetails += ` · Routing: ${method.routing_number}`;
+          }
+        }
+        
+        // Add verification status badge
+        let verificationBadge = '';
+        if (method.verification_status) {
+          const statusClass = method.verification_status === 'verified' ? 'verified' : 'pending';
+          verificationBadge = `<span class="verification-badge ${statusClass}">${method.verification_status}</span>`;
+        }
+        
+        // Add warning if present
+        let warningMessage = '';
+        if (method.warning) {
+          warningMessage = `<div class="payment-method-warning">${method.warning}</div>`;
+        }
+        
+        // Build supported rails/payment methods
+        let supportedRails = '';
+        if (method.supported_rails && method.supported_rails.length > 0) {
+          supportedRails = `<div class="supported-rails">
+            ${method.supported_rails.map(rail => `<span class="rail">${formatRailName(rail)}</span>`).join('')}
+          </div>`;
+        }
+        
+        // Add default indicator
+        let defaultIndicator = '';
+        if (method.is_default) {
+          defaultIndicator = '<span class="default-badge">Default</span>';
+        }
+        
+        html += `
+          <div class="payment-method">
+            <div class="payment-method-details">
+              <div class="payment-method-header">
+                <div class="payment-method-type">${formatPaymentType(paymentType)}</div>
+                ${defaultIndicator}
+                ${verificationBadge}
+              </div>
+              <div>${methodDetails}</div>
+              ${warningMessage}
+              ${supportedRails}
+            </div>
+          </div>
+        `;
+      });
+      
+      elements.paymentMethodsList.innerHTML = html;
+    }
+    
+    /**
+     * Format rail name to be more user-friendly
+     */
+    function formatRailName(rail) {
+      const railNames = {
+        'same_day_ach': 'Same-day ACH',
+        'standard_ach': 'Standard ACH',
+        'wire': 'Wire Transfer',
+        'instant_bank': 'Instant Bank',
+        'instant_card': 'Instant Card'
+      };
+      
+      return railNames[rail] || rail;
+    }
+    
+    /**
+     * Format payment type
+     */
+    function formatPaymentType(type) {
+      const types = {
+        'card': 'Credit/Debit Card',
+        'bank': 'Bank Account'
+      };
+      
+      return types[type] || type;
+    }
+    
+    /**
+     * Refresh payment methods
+     */
+    function refreshPaymentMethods(callback) {
+      if (!state.rootpay) {
+        showStatus('RootPay not initialized', 'error');
+        return;
+      }
+      
+      // Set a flag to indicate a refresh is in progress to prevent loops
+      if (state.refreshInProgress) {
+        console.log('Payment methods refresh already in progress');
+        return;
+      }
+      
+      state.refreshInProgress = true;
+      elements.refreshPaymentMethodsBtn.disabled = true;
+      elements.refreshPaymentMethodsBtn.textContent = 'Refreshing...';
+      
+      // Ensure callback is a function
+      const safeCallback = typeof callback === 'function' ? callback : function() {};
+      
+      state.rootpay.refreshPaymentMethods(function(error, paymentMethods) {
+        state.refreshInProgress = false;
+        elements.refreshPaymentMethodsBtn.disabled = false;
+        elements.refreshPaymentMethodsBtn.textContent = 'Refresh Payment Methods';
+        
+        if (error) {
+          showPaymentMethodsStatus('Error refreshing payment methods: ' + error, 'error');
+        } else {
+          // Only show a status message if this was a manual refresh (button click)
+          // but not during initialization or automatic refreshes
+          if (!state.initializing && !state.submitInProgress) {
+            showPaymentMethodsStatus('Payment methods refreshed', 'success');
+          }
+        }
+        
+        safeCallback(error, paymentMethods);
+      });
+    }
+    
+    /**
+     * Custom handler for payment methods update
+     */
+    function handlePaymentMethodsUpdate(paymentMethods) {
+      // Log the actual data received for debugging
+      console.log('Received payment methods data:', paymentMethods);
+      
+      // Always process the first update or when requested
+      if (state.refreshInProgress || state.submitInProgress || state.initializing || !state.paymentMethodsInitialized) {
+        console.log('Processing payment methods update:', 
+          state.refreshInProgress ? 'explicit refresh' : 
+          state.submitInProgress ? 'after submission' : 
+          state.initializing ? 'during initialization' : 
+          'first update');
+        
+        state.lastPaymentMethodsUpdate = Date.now();
+        state.paymentMethodsInitialized = true;
+        
+        // Check if the data is in the expected format
+        if (paymentMethods && (Array.isArray(paymentMethods) || (paymentMethods.data && Array.isArray(paymentMethods.data)))) {
+          renderPaymentMethods(paymentMethods);
+        } else {
+          console.error('Invalid payment methods data format:', paymentMethods);
+          // Handle the case where data format is incorrect
+          elements.paymentMethodsList.innerHTML = '<p>Error: Invalid payment methods data format</p>';
+        }
+      } else {
+        console.log('Ignoring automatic payment methods update from iframe');
+      }
+    }
+    
+    // ===================================================
     // EVENT HANDLERS
     // ===================================================
     
@@ -317,19 +546,28 @@
       }
       
       try {
+        // Set initializing flag to true
+        state.initializing = true;
+        
         // Initialize RootPay instance
         state.rootpay = RootPay.init({
           token: token,
           payee_id: payeeId,
           debug: true,
           onSuccess: function(response) {
-            showStatus('Payment method added successfully!', 'success');
-            displayResponseDetails(response, true);
+            // Only show success message for payment method submission
+            // This callback will be triggered by other successful operations too,
+            // but we only want to show this specific message for submissions
+            if (state.submitInProgress) {
+              showStatus('Payment method added successfully!', 'success');
+              // Don't display raw response details anymore
+            }
           },
           onError: function(errorMessage, errorDetails) {
             showStatus('Error: ' + errorMessage, 'error');
             displayResponseDetails(errorDetails, false);
-          }
+          },
+          onPaymentMethodsUpdate: handlePaymentMethodsUpdate
         });
         
         // Create initial card fields
@@ -344,8 +582,29 @@
         elements.paymentButton.style.opacity = '0.5';
         elements.paymentButton.style.cursor = 'not-allowed';
         
+        // Add a loading indicator for payment methods
+        elements.paymentMethodsList.innerHTML = '<p>Loading payment methods...</p>';
+        
+        // Initial fetch of payment methods with a delay to allow iframe to initialize
+        setTimeout(() => {
+          refreshPaymentMethods(function(error, paymentMethods) {
+            // Reset initializing flag
+            state.initializing = false;
+            
+            if (error) {
+              console.warn('Initial payment methods fetch failed:', error);
+              elements.paymentMethodsList.innerHTML = 
+                '<p>Could not load payment methods. <button id="retry-payment-methods" class="refresh-button">Try Again</button></p>';
+              
+              // Add event listener for the retry button
+              document.getElementById('retry-payment-methods').addEventListener('click', refreshPaymentMethods);
+            }
+          });
+        }, 1500); // Delay initial fetch to ensure iframe is ready
+        
         console.log('RootPay initialized successfully');
       } catch (error) {
+        state.initializing = false;
         showStatus('Error initializing RootPay: ' + error.message, 'error');
         console.error('Initialization error:', error);
       }
@@ -389,19 +648,33 @@
       
       showStatus('Processing payment method...', 'info');
       
+      // Set the submit flag to allow payment method updates
+      state.submitInProgress = true;
+      
+      // Get the isDefault value from the checkbox
+      const isDefault = document.getElementById('set-as-default').checked;
+      
       state.rootpay.submitPaymentMethod(function(status, response) {
         console.log('Submission status:', status);
         
         if (status === 201) {
           showStatus('Payment method added successfully!', 'success');
-          displayResponseDetails(response, true);
+          
+          // Hide response details for successful submissions since we show the payment methods list
+          // Data is still available in the SDK if needed
+          
+          // Explicitly refresh payment methods after successful submission
+          refreshPaymentMethods(function() {
+            state.submitInProgress = false;
+          });
         } else {
           const errorMessage = response.error || 'Unknown error';
           const statusCode = response.status || status;
           showStatus(`Error ${statusCode}: ${errorMessage}`, 'error');
           displayResponseDetails(response, false);
+          state.submitInProgress = false;
         }
-      }, state.paymentType);
+      }, state.paymentType, { isDefault });
     }
     
     // ===================================================
@@ -418,6 +691,7 @@
       // Set up event listeners
       elements.initializeBtn.addEventListener('click', initializeRootPay);
       elements.paymentButton.addEventListener('click', submitPaymentMethod);
+      elements.refreshPaymentMethodsBtn.addEventListener('click', refreshPaymentMethods);
       
       // Payment method selection
       document.querySelectorAll('input[name="payment-method-type"]').forEach(radio => {

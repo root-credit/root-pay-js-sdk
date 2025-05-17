@@ -1,6 +1,6 @@
 # RootPay JavaScript SDK
 
-A secure JavaScript SDK for collecting payment information that helps maintain PCI compliance by keeping sensitive data off your servers.
+A secure JavaScript SDK for collecting payment information without sensitive data touching the client's servers. This SDK enables easy integration with the RootPay platform for securely collecting card and bank account details.
 
 ## Features
 
@@ -8,10 +8,11 @@ A secure JavaScript SDK for collecting payment information that helps maintain P
 - Cross-origin communication via iframes
 - Token-based authentication
 - PCI-compliant architecture
-- Cross-browser compatibility
+- Manage saved payment methods (view, refresh, and submit new payment methods)
 
 ## Installation
 
+### Production Use (CDN)
 For production use, include RootPay directly from the jsDelivr CDN:
 
 ```html
@@ -22,24 +23,28 @@ For production use, include RootPay directly from the jsDelivr CDN:
 <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@VERSION/rootpay.min.js"></script>
 ```
 
-## Integration Guide
+## Testing Demo
 
-To use RootPay in your application:
+We provide a sample integration demo that you can use to test the SDK with your RootPay account.
 
-1. Initialize the SDK with your session token
-2. Create payment input fields
-3. Submit payment method information
+### Prerequisites for Testing
 
-See API Reference for detailed usage instructions.
+1. You must have a RootPay account to use the demo
+2. You need a valid session token from your backend
+3. You need your payee ID from the RootPay platform
 
-## Token-Based Authentication Flow
+### Using the Demo
 
-For security reasons, RootPay uses a token-based authentication system:
+1. Download `styles.css` and `index.html` from the distribution package
+2. Place these files in a directory
+3. Open `index.html` in a web browser (the script loads automatically from CDN)
+4. Enter your session token and payee ID in the form
+5. Click "Initialize Payment Form" to test the SDK
+6. You can test both card and bank account payment methods
 
-1. Your backend server requests a session token from the RootPay API
-2. The token is passed to your frontend
-3. Your frontend initializes the RootPay SDK with this token
-4. The SDK uses the token for all operations
+For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
+
+Refer to the official documentation at https://docs.root.credit for details on generating session tokens and verifying your test transactions.
 
 ## API Reference
 
@@ -53,7 +58,7 @@ RootPay.init(options)
 - `options` (Object):
   - `token` (String): RootPay session token
   - `payee_id` (String): Payee ID
-  - `apiBaseUrl` (String, optional): Override the API URL (default: 'http://localhost:8000')
+  - `apiBaseUrl` (String, optional): Override the API URL
   - `debug` (Boolean, optional): Enable detailed logging (default: false)
   - `onSuccess` (Function): Callback for successful payment method creation
   - `onError` (Function): Callback for payment method creation errors
@@ -78,7 +83,7 @@ rootpay.field(selector, options)
 ### Payment Method Management
 
 ```javascript
-rootpay.submitPaymentMethod(callback, type)
+rootpay.submitPaymentMethod(callback, type, options)
 ```
 
 **Parameters:**
@@ -86,6 +91,8 @@ rootpay.submitPaymentMethod(callback, type)
   - `status` (Number): HTTP status code
   - `response` (Object): Response data
 - `type` (String): Payment method type ('card' or 'bank')
+- `options` (Object, optional): Additional options
+  - `isDefault` (Boolean, optional): Whether this payment method should be set as default (default: false)
 
 ### Utility Methods
 
@@ -96,50 +103,20 @@ rootpay.getFormState()
 **Returns:**
 - `getFormState()`: Current form state object including field validity and values
 
-## Browser Compatibility
+### Payment Methods Management
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- IE11+ (with polyfills)
+```javascript
+rootpay.getPaymentMethods()
+```
 
-## Security Practices
+**Returns:**
+- Array of payment method objects
 
-- Never store payment information on your servers
-- Always use HTTPS for production
-- Keep API keys and secrets in environment variables
-- Request tokens with the minimum necessary scopes
-- Set appropriate token TTL values
-- Never hardcode credentials in client-side code
+```javascript
+rootpay.refreshPaymentMethods(callback)
+```
 
-## Testing with RootPay Account
-
-To properly test the SDK with the demo implementation, follow these steps:
-
-## Testing Demo
-
-We provide a sample integration demo `index.html` file that you can use to test the SDK with your RootPay account:
-
-### Prerequisites for Testing
-
-1. You must have a RootPay account to use the demo
-2. You need a valid session token from your backend (see "Testing with RootPay Account" section above)
-3. You need your payee ID from the RootPay platform
-
-### Using the Demo
-
-1. Download `styles.css` and `index.html` from the distribution package
-2. Place these files in a directory
-3. Open `index.html` in a web browser (the script loads automatically from CDN)
-4. Enter your session token and payee ID in the form
-5. Click "Initialize Payment Form" to test the SDK
-6. You can test both card and bank account payment methods
-
-For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
-
-Refer to the "Testing with RootPay Account" section above and the official documentation at https://docs.root.credit for details on generating session tokens and verifying your test transactions.
-
-## License
-
-MIT
+**Parameters:**
+- `callback` (Function): Callback function with parameters:
+  - `error` (String|null): Error message if the refresh fails, null on success
+  - `paymentMethods` (Array): Array of payment method objects
