@@ -8,7 +8,7 @@ A secure JavaScript SDK for collecting payment information without sensitive dat
 - Cross-origin communication via iframes
 - Token-based authentication
 - PCI-compliant architecture
-- Manage saved payment methods (view, refresh, and submit new payment methods)
+- Manage saved payment methods (view, fetch, and submit new payment methods)
 
 ## Installation
 
@@ -92,7 +92,7 @@ rootpay.submitPaymentMethod(callback, type, options)
   - `response` (Object): Response data
 - `type` (String): Payment method type ('card' or 'bank')
 - `options` (Object, optional): Additional options
-  - `isDefault` (Boolean, optional): Whether this payment method should be set as default (default: false)
+  - `isDefault` (Boolean, optional): Whether this payment method should be set as default (default: true)
 
 ### Utility Methods
 
@@ -106,17 +106,19 @@ rootpay.getFormState()
 ### Payment Methods Management
 
 ```javascript
-rootpay.getPaymentMethods()
-```
-
-**Returns:**
-- Array of payment method objects
-
-```javascript
-rootpay.refreshPaymentMethods(callback)
+rootpay.getPaymentMethods(callback, options)
 ```
 
 **Parameters:**
-- `callback` (Function): Callback function with parameters:
-  - `error` (String|null): Error message if the refresh fails, null on success
+- `callback` (Function, optional): Callback function with parameters:
+  - `error` (String|null): Error message if the fetch fails, null on success
   - `paymentMethods` (Array): Array of payment method objects
+  - `paginationInfo` (Object): Pagination details including:
+    - `hasMore` (Boolean): Whether there are more payment methods to fetch
+    - `nextCursor` (String|null): Cursor to use for fetching the next page, null if no more pages
+- `options` (Object, optional): Pagination options
+  - `cursor` (String): Cursor for fetching the next page of results
+
+**Returns:**
+- When called without a callback: Array of current payment methods (synchronous use)
+- When called with a callback: Fetches latest payment methods from server (asynchronous use)

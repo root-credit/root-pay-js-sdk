@@ -54,13 +54,6 @@
           <div id="routing-number-container" class="secure-field"></div>
         </div>
 
-        <div class="field-container">
-          <label class="checkbox-label">
-            <input type="checkbox" id="set-as-default" name="set-as-default">
-            Set as default payment method
-          </label>
-        </div>
-
         <button id="payment-button" class="submit-button" disabled>Add Payment Method</button>
       </div>
       
@@ -454,6 +447,7 @@
     
     /**
      * Refresh payment methods
+     * @param {Function} callback - Optional callback function
      */
     function refreshPaymentMethods(callback) {
       if (!state.rootpay) {
@@ -474,7 +468,7 @@
       // Ensure callback is a function
       const safeCallback = typeof callback === 'function' ? callback : function() {};
       
-      state.rootpay.refreshPaymentMethods(function(error, paymentMethods) {
+      state.rootpay.getPaymentMethods(function(error, paymentMethods) {
         state.refreshInProgress = false;
         elements.refreshPaymentMethodsBtn.disabled = false;
         elements.refreshPaymentMethodsBtn.textContent = 'Refresh Payment Methods';
@@ -651,9 +645,6 @@
       // Set the submit flag to allow payment method updates
       state.submitInProgress = true;
       
-      // Get the isDefault value from the checkbox
-      const isDefault = document.getElementById('set-as-default').checked;
-      
       state.rootpay.submitPaymentMethod(function(status, response) {
         console.log('Submission status:', status);
         
@@ -674,7 +665,7 @@
           displayResponseDetails(response, false);
           state.submitInProgress = false;
         }
-      }, state.paymentType, { isDefault });
+      }, state.paymentType);
     }
     
     // ===================================================
