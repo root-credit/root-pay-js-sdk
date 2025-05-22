@@ -25,22 +25,31 @@ For production use, include RootPay directly from the jsDelivr CDN:
 
 ## Testing Demo
 
-We provide a sample integration demo that you can use to test the SDK with your RootPay account.
+We provide sample integration demos that you can use to test the SDK with your RootPay account.
 
 ### Prerequisites for Testing
 
-1. You must have a RootPay account to use the demo
+1. You must have a RootPay account to use the demos
 2. You need a valid session token from your backend
 3. You need your payee ID from the RootPay platform
 
-### Using the Demo
+### Web Demo
 
-1. Download `styles.css` and `index.html` from the distribution package
-2. Place these files in a directory
+1. Download the files from the `web` directory
+2. The files are `styles.css` and `index.html`.
 3. Open `index.html` in a web browser (the script loads automatically from CDN)
 4. Enter your session token and payee ID in the form
 5. Click "Initialize Payment Form" to test the SDK
 6. You can test both card and bank account payment methods
+
+### iOS Demo
+
+1. Open the Xcode project in the `ios-example` directory
+2. Build and run the project on a simulator or device
+3. Tap "Collect Payment Info" to open the payment form
+4. The demo includes a WebView that loads the SDK and connects to RootPay
+
+### Test Values
 
 For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
 
