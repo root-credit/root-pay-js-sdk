@@ -110,7 +110,7 @@ rootpay.getFormState()
 ```
 
 **Returns:**
-- `getFormState()`: Current form state object including field validity and values
+- `getFormState()`: Current form state object including field validities.
 
 ### Payment Methods Management
 

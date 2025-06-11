@@ -315,7 +315,7 @@ struct RootPayWebView: UIViewRepresentable {
                     
                     <div class="payment-type">
                         <label>
-                            <input type="radio" name="payment-type" value="card" checked> Credit/Debit Card
+                            <input type="radio" name="payment-type" value="card" checked> Debit Card
                         </label>
                         <label>
                             <input type="radio" name="payment-type" value="bank"> Bank Account
@@ -327,6 +327,11 @@ struct RootPayWebView: UIViewRepresentable {
                         <div class="form-group">
                             <label for="card-number-container">Card Number</label>
                             <div id="card-number-container" class="secure-field"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm-card-number-container">Confirm Card Number</label>
+                            <div id="confirm-card-number-container" class="secure-field"></div>
                         </div>
                         
                         <div class="form-group">
@@ -343,13 +348,18 @@ struct RootPayWebView: UIViewRepresentable {
                         </div>
                         
                         <div class="form-group">
+                            <label for="confirm-account-number-container">Confirm Account Number</label>
+                            <div id="confirm-account-number-container" class="secure-field"></div>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="routing-number-container">Routing Number</label>
                             <div id="routing-number-container" class="secure-field"></div>
                         </div>
                     </div>
                     
 
-                    <button id="submit-btn" disabled>Submit Payment Information</button>
+                    <button id="submit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Submit Payment Information</button>
                     
                     <div id="status-message" class="status"></div>
                     
@@ -366,10 +376,11 @@ struct RootPayWebView: UIViewRepresentable {
                 
                 <!-- Test Values -->
                 <div class="test-values">
-                    <h3>Test Values</h3>
-                    <p><strong>Card:</strong> 4111 1111 1111 1111 with any future expiry date</p>
-                    <p><strong>Account Number:</strong> 1234567890</p>
-                    <p><strong>Routing Number:</strong> 111000025</p>
+                    <h3>Test Values & Features</h3>
+                    <p><strong>Confirmation Fields:</strong> Both card number and account number have confirmation fields to prevent typos</p>
+                    <p><strong>Test Card:</strong> 4111 1111 1111 1111 with any future expiry date</p>
+                    <p><strong>Test Account Number:</strong> 1234567890</p>
+                    <p><strong>Test Routing Number:</strong> 111000025</p>
                 </div>
             </div>
             
@@ -513,17 +524,22 @@ struct RootPayWebView: UIViewRepresentable {
                     fields: {
                         cardNumber: null,
                         cardExpiry: null,
+                        confirmCardNumber: null,
                         accountNumber: null,
-                        routingNumber: null
+                        routingNumber: null,
+                        confirmAccountNumber: null
                     },
                     paymentType: 'card',
                     validation: {
                         cardNumber: false,
                         cardExpiry: false,
+                        confirmCardNumber: false,
                         accountNumber: false,
-                        routingNumber: false
+                        routingNumber: false,
+                        confirmAccountNumber: false
                     },
-                    submitInProgress: false
+                    submitInProgress: false,
+                    validationTimeout: null
                 };
                 
                 // Initialize app after SDK loads
@@ -536,6 +552,9 @@ struct RootPayWebView: UIViewRepresentable {
                     // Hide loading and show setup form
                     document.getElementById('sdk-loading').classList.add('hidden');
                     document.getElementById('setup-form').classList.remove('hidden');
+
+                    // Ensure button is initially disabled
+                    updateSubmitButtonState();
                     
                     // Set up event listeners
                     document.getElementById('initialize-btn').addEventListener('click', initializeRootPay);
@@ -632,9 +651,23 @@ struct RootPayWebView: UIViewRepresentable {
                             name: 'card-number',
                             style: { fontSize: '18px', fontWeight: '500', color: '#333' },
                             onValidChange: function(isValid) {
+                                console.log('🔢 Card number validation changed:', isValid);
                                 state.validation.cardNumber = isValid;
                                 updateSubmitButtonState();
-                                console.log('Card number valid:', isValid);
+                            }
+                        });
+                    }
+                    
+                    if (!state.fields.confirmCardNumber) {
+                        state.fields.confirmCardNumber = state.rootpay.field('#confirm-card-number-container', {
+                            type: 'confirm-card-number',
+                            name: 'confirm-card-number',
+                            style: { fontSize: '18px', fontWeight: '500', color: '#333' },
+                            placeholder: 'Re-enter card number',
+                            onValidChange: function(isValid) {
+                                console.log('✅ Confirm card number validation changed:', isValid);
+                                state.validation.confirmCardNumber = isValid;
+                                updateSubmitButtonState();
                             }
                         });
                     }
@@ -645,9 +678,9 @@ struct RootPayWebView: UIViewRepresentable {
                             name: 'card-expiry',
                             style: { fontSize: '18px', fontWeight: '500', color: '#333' },
                             onValidChange: function(isValid) {
+                                console.log('📅 Card expiry validation changed:', isValid);
                                 state.validation.cardExpiry = isValid;
                                 updateSubmitButtonState();
-                                console.log('Card expiry valid:', isValid);
                             }
                         });
                     }
@@ -664,7 +697,22 @@ struct RootPayWebView: UIViewRepresentable {
                             name: 'account-number',
                             style: { fontSize: '18px', fontWeight: '500', color: '#333' },
                             onValidChange: function(isValid) {
+                                console.log('🏦 Account number validation changed:', isValid);
                                 state.validation.accountNumber = isValid;
+                                updateSubmitButtonState();
+                            }
+                        });
+                    }
+                    
+                    if (!state.fields.confirmAccountNumber) {
+                        state.fields.confirmAccountNumber = state.rootpay.field('#confirm-account-number-container', {
+                            type: 'confirm-account-number',
+                            name: 'confirm-account-number',
+                            style: { fontSize: '18px', fontWeight: '500', color: '#333' },
+                            placeholder: 'Re-enter account number',
+                            onValidChange: function(isValid) {
+                                console.log('✅ Confirm account number validation changed:', isValid);
+                                state.validation.confirmAccountNumber = isValid;
                                 updateSubmitButtonState();
                             }
                         });
@@ -676,6 +724,7 @@ struct RootPayWebView: UIViewRepresentable {
                             name: 'routing-number',
                             style: { fontSize: '18px', fontWeight: '500', color: '#333' },
                             onValidChange: function(isValid) {
+                                console.log('🏛️ Routing number validation changed:', isValid);
                                 state.validation.routingNumber = isValid;
                                 updateSubmitButtonState();
                             }
@@ -753,17 +802,55 @@ struct RootPayWebView: UIViewRepresentable {
                     container.innerHTML = html;
                 }
                 
-                // Update submit button state
+                // Update submit button state with debouncing and validation stability check
                 function updateSubmitButtonState() {
-                    let isValid = false;
-                    
-                    if (state.paymentType === 'card') {
-                        isValid = state.validation.cardNumber && state.validation.cardExpiry;
-                    } else {
-                        isValid = state.validation.accountNumber && state.validation.routingNumber;
+                    // Clear any existing timeout
+                    if (state.validationTimeout) {
+                        clearTimeout(state.validationTimeout);
                     }
                     
-                    document.getElementById('submit-btn').disabled = !isValid;
+                    // Add a longer delay to handle SDK's internal validation changes
+                    state.validationTimeout = setTimeout(function() {
+                        let isValid = false;
+                        
+                        if (state.paymentType === 'card') {
+                            isValid = state.validation.cardNumber && state.validation.cardExpiry && state.validation.confirmCardNumber;
+                        } else {
+                            isValid = state.validation.accountNumber && state.validation.routingNumber && state.validation.confirmAccountNumber;
+                        }
+                        
+                        const submitButton = document.getElementById('submit-btn');
+                        
+                        // Only change button state if it's different from current state
+                        const currentlyDisabled = submitButton.disabled;
+                        const shouldBeDisabled = !isValid;
+                        
+                        if (currentlyDisabled !== shouldBeDisabled) {
+                            submitButton.disabled = shouldBeDisabled;
+                            submitButton.style.opacity = isValid ? '1' : '0.5';
+                            submitButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
+                            
+                            console.log('Form validation (debounced):', isValid ? 'Valid' : 'Invalid', state.validation);
+                            console.log('Button state changed:', currentlyDisabled ? 'was disabled' : 'was enabled', '→', shouldBeDisabled ? 'now disabled' : 'now enabled');
+                        }
+                        
+                        // Add a stability check - verify the state again after a short delay
+                        setTimeout(function() {
+                            let finalIsValid = false;
+                            
+                            if (state.paymentType === 'card') {
+                                finalIsValid = state.validation.cardNumber && state.validation.cardExpiry && state.validation.confirmCardNumber;
+                            } else {
+                                finalIsValid = state.validation.accountNumber && state.validation.routingNumber && state.validation.confirmAccountNumber;
+                            }
+                            
+                            if (finalIsValid !== isValid) {
+                                console.log('⚠️ Validation state changed during stability check, re-evaluating...');
+                                updateSubmitButtonState();
+                            }
+                        }, 200); // Stability check after 200ms
+                        
+                    }, 150); // Increased debounce delay to 150ms
                 }
                 
                 // Show status messages
