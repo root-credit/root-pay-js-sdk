@@ -33,7 +33,7 @@
       <div class="payment-form">
         <div class="payment-type-selector">
           <label>
-            <input type="radio" name="payment-method-type" value="card" checked> Credit/Debit Card
+            <input type="radio" name="payment-method-type" value="card" checked> Debit Card
           </label>
           <label>
             <input type="radio" name="payment-method-type" value="bank"> Bank Account
@@ -43,6 +43,8 @@
         <div id="card-fields">
           <label for="card-number-container">Card Number</label>
           <div id="card-number-container" class="secure-field"></div>
+          <label for="confirm-card-number-container">Confirm Card Number</label>
+          <div id="confirm-card-number-container" class="secure-field"></div>
           <label for="card-expiry-container">Expiry Date</label>
           <div id="card-expiry-container" class="secure-field"></div>
         </div>
@@ -50,6 +52,8 @@
         <div id="bank-fields" style="display: none;">
           <label for="account-number-container">Account Number</label>
           <div id="account-number-container" class="secure-field"></div>
+          <label for="confirm-account-number-container">Confirm Account Number</label>
+          <div id="confirm-account-number-container" class="secure-field"></div>
           <label for="routing-number-container">Routing Number</label>
           <div id="routing-number-container" class="secure-field"></div>
         </div>
@@ -83,6 +87,12 @@
         <li>You need a specific payee ID from your RootPay account</li>
         <li>Generate a session token using the token endpoint (see documentation at <a href="https://docs.root.credit" target="_blank">docs.root.credit</a>)</li>
       </ol>
+      <p><strong>Features:</strong></p>
+      <ul>
+        <li><strong>Confirmation Fields:</strong> Both card number and account number have confirmation fields to prevent typos</li>
+        <li><strong>Real-time Validation:</strong> The submit button is only enabled when all fields are valid and confirmation fields match</li>
+        <li><strong>Secure Input:</strong> All sensitive data is handled in secure iframes</li>
+      </ul>
       <p><strong>Test Values:</strong></p>
       <ul>
         <li><strong>Card:</strong> 4111 1111 1111 1111 with any future expiry date</li>
@@ -124,21 +134,26 @@
       fields: {
         cardNumber: null,
         cardExpiry: null,
+        confirmCardNumber: null,
         accountNumber: null,
-        routingNumber: null
+        routingNumber: null,
+        confirmAccountNumber: null
       },
       paymentType: 'card',
       validation: {
         cardNumber: false,
         cardExpiry: false,
+        confirmCardNumber: false,
         accountNumber: false,
-        routingNumber: false
+        routingNumber: false,
+        confirmAccountNumber: false
       },
       refreshInProgress: false,
       submitInProgress: false,
       lastPaymentMethodsUpdate: 0,
       initializing: false,
-      paymentMethodsInitialized: false
+      paymentMethodsInitialized: false,
+      validationTimeout: null
     };
     
     // ===================================================
@@ -164,18 +179,32 @@
     // ===================================================
     
     /**
-     * Update submit button state based on validation
+     * Update submit button state based on validation with debouncing
      */
     function updateSubmitButtonState() {
-      const isValid = state.paymentType === 'card'
-        ? (state.validation.cardNumber && state.validation.cardExpiry)
-        : (state.validation.accountNumber && state.validation.routingNumber);
+      // Clear any existing timeout
+      if (state.validationTimeout) {
+        clearTimeout(state.validationTimeout);
+      }
       
-      elements.paymentButton.disabled = !isValid;
-      elements.paymentButton.style.opacity = isValid ? '1' : '0.5';
-      elements.paymentButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
-      
-      console.log('Form validation:', isValid ? 'Valid' : 'Invalid');
+      // Add a small delay to debounce rapid validation changes
+      state.validationTimeout = setTimeout(function() {
+        const isValid = state.paymentType === 'card'
+          ? (state.validation.cardNumber && state.validation.cardExpiry && state.validation.confirmCardNumber)
+          : (state.validation.accountNumber && state.validation.routingNumber && state.validation.confirmAccountNumber);
+        
+        // Only change button state if it's different from current state
+        const currentlyDisabled = elements.paymentButton.disabled;
+        const shouldBeDisabled = !isValid;
+        
+        if (currentlyDisabled !== shouldBeDisabled) {
+          elements.paymentButton.disabled = shouldBeDisabled;
+          elements.paymentButton.style.opacity = isValid ? '1' : '0.5';
+          elements.paymentButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
+          
+          console.log('Form validation (debounced):', isValid ? 'Valid' : 'Invalid');
+        }
+      }, 50); // Shorter delay for web version
     }
     
     /**
@@ -288,6 +317,19 @@
         });
       }
       
+      if (!state.fields.confirmCardNumber) {
+        state.fields.confirmCardNumber = state.rootpay.field('#confirm-card-number-container', {
+          type: 'confirm-card-number',
+          name: 'confirm-card-number',
+          style: defaultStyles.cardNumber,
+          placeholder: 'Re-enter card number',
+          onValidChange: function(isValid) {
+            state.validation.confirmCardNumber = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+      
       if (!state.fields.cardExpiry) {
         state.fields.cardExpiry = state.rootpay.field('#card-expiry-container', {
           type: 'card-expiry',
@@ -312,6 +354,19 @@
           style: defaultStyles.cardNumber,
           onValidChange: function(isValid) {
             state.validation.accountNumber = isValid;
+            updateSubmitButtonState();
+          }
+        });
+      }
+      
+      if (!state.fields.confirmAccountNumber) {
+        state.fields.confirmAccountNumber = state.rootpay.field('#confirm-account-number-container', {
+          type: 'confirm-account-number',
+          name: 'confirm-account-number',
+          style: defaultStyles.cardNumber,
+          placeholder: 'Re-enter account number',
+          onValidChange: function(isValid) {
+            state.validation.confirmAccountNumber = isValid;
             updateSubmitButtonState();
           }
         });
@@ -438,7 +493,7 @@
      */
     function formatPaymentType(type) {
       const types = {
-        'card': 'Credit/Debit Card',
+        'card': 'Debit Card',
         'bank': 'Bank Account'
       };
       
