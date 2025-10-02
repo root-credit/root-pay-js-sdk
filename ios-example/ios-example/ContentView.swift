@@ -517,8 +517,7 @@ struct RootPayWebView: UIViewRepresentable {
                     
                     // Now load the SDK
                     const script = document.createElement('script');
-                    // script.src = 'https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js';
-                    script.src = 'http://127.0.0.1:5500/dist/root-pay.iife.js';
+                    script.src = 'https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js';
                     script.onload = function() {
                         console.log('✅ RootPay SDK loaded successfully!');
                         initializeApp();
