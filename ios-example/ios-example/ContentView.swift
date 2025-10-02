@@ -656,7 +656,6 @@ struct RootPayWebView: UIViewRepresentable {
                     console.log('🔧 Configuration:', JSON.stringify(initConfig, null, 2));
                     
                     try {
-                        // Initialize with userType as first parameter (v2.0.0)
                         state.rootpay = RootPay.init(state.userType, initConfig);
                         
                         console.log('✅ RootPay initialized with userType:', state.userType);
@@ -777,7 +776,6 @@ struct RootPayWebView: UIViewRepresentable {
                     showStatus('Processing...', 'info');
                     state.submitInProgress = true;
                     
-                    // Updated callback signature: (error, response) - v2.0.0
                     state.rootpay.submitPaymentMethod(function(error, response) {
                         console.log('📤 Submission result - error:', error, 'response:', response);
                         
