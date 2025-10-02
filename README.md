@@ -31,14 +31,14 @@ We provide sample integration demos that you can use to test the SDK with your R
 
 1. You must have a RootPay account to use the demos
 2. You need a valid session token from your backend
-3. You need your payee ID from the RootPay platform
+3. You need your payee ID or payer ID from the RootPay platform (depending on your use case)
 
 ### Web Demo
 
 1. Download the files from the `web` directory
 2. The files are `styles.css` and `index.html`.
 3. Open `index.html` in a web browser (the script loads automatically from CDN)
-4. Enter your session token and payee ID in the form
+4. Enter your session token, user type (payee or payer), and corresponding ID in the form
 5. Click "Initialize Payment Form" to test the SDK
 6. You can test both card and bank account payment methods
 
@@ -60,19 +60,32 @@ Refer to the official documentation at https://docs.root.credit for details on g
 ### Initialization
 
 ```javascript
-RootPay.init(options)
+RootPay.init(userType, options)
 ```
 
 **Parameters:**
+- `userType` (String): User type - either `"payee"` or `"payer"` to set the correct ID
 - `options` (Object):
   - `token` (String): RootPay session token
-  - `payee_id` (String): Payee ID
+  - `payee_id` (String): Payee ID (when userType is "payee")
+  - `payer_id` (String): Payer ID (when userType is "payer")
   - `apiBaseUrl` (String, optional): Override the API URL
   - `debug` (Boolean, optional): Enable detailed logging (default: false)
   - `onSuccess` (Function): Callback for successful payment method creation
   - `onError` (Function): Callback for payment method creation errors
 
 **Returns:** RootPay instance
+
+**Example:**
+```javascript
+const sdk = window.RootPay.init("payee", {
+  token: "your-session-token",
+  payee_id: "your-payee-id",
+  debug: true,
+  onSuccess: (response) => console.log("Success:", response),
+  onError: (error) => console.error("Error:", error)
+});
+```
 
 ### Field Creation
 
@@ -97,11 +110,22 @@ rootpay.submitPaymentMethod(callback, type, options)
 
 **Parameters:**
 - `callback` (Function): Callback function with parameters:
-  - `status` (Number): HTTP status code
+  - `error` (Object|null): Error object if submission fails, null on success
   - `response` (Object): Response data
 - `type` (String): Payment method type ('card' or 'bank')
 - `options` (Object, optional): Additional options
   - `isDefault` (Boolean, optional): Whether this payment method should be set as default (default: true)
+
+**Example:**
+```javascript
+sdk.submitPaymentMethod((error, response) => {
+  if (error) {
+    console.error("Submission failed:", error);
+  } else {
+    console.log("Payment method submitted:", response);
+  }
+}, 'card', { isDefault: true });
+```
 
 ### Utility Methods
 
@@ -120,7 +144,7 @@ rootpay.getPaymentMethods(callback, options)
 
 **Parameters:**
 - `callback` (Function, optional): Callback function with parameters:
-  - `error` (String|null): Error message if the fetch fails, null on success
+  - `error` (Object|null): Error object if the fetch fails, null on success
   - `paymentMethods` (Array): Array of payment method objects
   - `paginationInfo` (Object): Pagination details including:
     - `hasMore` (Boolean): Whether there are more payment methods to fetch

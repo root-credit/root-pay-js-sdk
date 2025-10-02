@@ -1,464 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RootPay Integration</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <h1>RootPay Integration</h1>
-    
-    <!-- Setup Form -->
-    <div id="setup-form">
-      <div class="form-group">
-        <label for="token">RootPay Token:</label>
-        <input type="text" id="token" placeholder="Enter your RootPay session token">
-      </div>
-      
-      <div class="form-group">
-        <label for="payee-id">Payee ID:</label>
-        <input type="text" id="payee-id" placeholder="Enter payee ID">
-      </div>
-      
-      <button id="initialize-btn">Initialize Payment Form</button>
-    </div>
-    
-    <!-- Main UI (initially hidden) -->
-    <div id="main-ui" class="hidden">
-      <h2>Enter Payment Information</h2>
-      
-      <!-- Payment Method Selector -->
-      <div class="payment-form">
-        <div class="payment-type-selector">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RootPay Integration</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>RootPay Integration</h1>
+
+      <!-- Setup Form -->
+      <div id="setup-form">
+        <div class="form-group">
           <label>
-            <input type="radio" name="payment-method-type" value="card" checked> Debit Card
+            <input type="radio" name="user-type" value="payee" checked />
+            Payee
           </label>
           <label>
-            <input type="radio" name="payment-method-type" value="bank"> Bank Account
+            <input type="radio" name="user-type" value="payer" />
+            Payer
           </label>
         </div>
 
-        <div id="card-fields">
-          <label for="card-number-container">Card Number</label>
-          <div id="card-number-container" class="secure-field"></div>
-          <label for="confirm-card-number-container">Confirm Card Number</label>
-          <div id="confirm-card-number-container" class="secure-field"></div>
-          <label for="card-expiry-container">Expiry Date</label>
-          <div id="card-expiry-container" class="secure-field"></div>
+        <div class="form-group">
+          <label for="token">RootPay Token:</label>
+          <input
+            type="text"
+            id="token"
+            placeholder="Enter your RootPay session token"
+          />
         </div>
 
-        <div id="bank-fields" style="display: none;">
-          <label for="account-number-container">Account Number</label>
-          <div id="account-number-container" class="secure-field"></div>
-          <label for="confirm-account-number-container">Confirm Account Number</label>
-          <div id="confirm-account-number-container" class="secure-field"></div>
-          <label for="routing-number-container">Routing Number</label>
-          <div id="routing-number-container" class="secure-field"></div>
+        <div class="form-group party-group">
+          <label for="party-id">Party ID:</label>
+          <input type="text" id="party-id" placeholder="Enter Payee Id" />
         </div>
 
-        <button id="payment-button" class="submit-button" disabled>Add Payment Method</button>
+        <button id="initialize-btn">Initialize Payment Form</button>
       </div>
-      
-      <div id="payment-status" class="status"></div>
-      <div id="response-details" class="response-details"></div>
-      
-      <!-- Payment Methods Section (New) -->
-      <div id="payment-methods-section">
-        <h2>Saved Payment Methods</h2>
-        <div id="payment-methods-list" class="payment-methods-container">
-          <p>Loading payment methods...</p>
-        </div>
-        
-        <button id="refresh-payment-methods" class="refresh-button">Refresh Payment Methods</button>
 
-        <div id="payment-methods-status" class="status"></div>
-        
+      <!-- Main UI (initially hidden) -->
+      <div id="main-ui" class="hidden">
+        <h2>Enter Payment Information</h2>
+
+        <!-- Payment Method Selector -->
+        <div class="payment-form">
+          <div class="payment-type-selector">
+            <label>
+              <input
+                type="radio"
+                name="payment-method-type"
+                value="card"
+                checked
+              />
+              Debit Card
+            </label>
+            <label>
+              <input type="radio" name="payment-method-type" value="bank" />
+              Bank Account
+            </label>
+          </div>
+
+          <div id="card-fields">
+            <label for="card-number-container">Card Number</label>
+            <div id="card-number-container" class="secure-field"></div>
+            <label for="confirm-card-number-container"
+              >Confirm Card Number</label
+            >
+            <div id="confirm-card-number-container" class="secure-field"></div>
+            <label for="card-expiry-container">Expiry Date</label>
+            <div id="card-expiry-container" class="secure-field"></div>
+          </div>
+
+          <div id="bank-fields" style="display: none">
+            <label for="account-number-container">Account Number</label>
+            <div id="account-number-container" class="secure-field"></div>
+            <label for="confirm-account-number-container"
+              >Confirm Account Number</label
+            >
+            <div
+              id="confirm-account-number-container"
+              class="secure-field"
+            ></div>
+            <label for="routing-number-container">Routing Number</label>
+            <div id="routing-number-container" class="secure-field"></div>
+          </div>
+
+          <button id="payment-button" class="submit-button" disabled>
+            Add Payment Method
+          </button>
+        </div>
+
+        <div id="payment-status" class="status"></div>
+        <div id="response-details" class="response-details"></div>
+
+        <!-- Payment Methods Section (New) -->
+        <div id="payment-methods-section">
+          <h2>Saved Payment Methods</h2>
+          <div id="payment-methods-list" class="payment-methods-container">
+            <p>Loading payment methods...</p>
+          </div>
+
+          <button id="refresh-payment-methods" class="refresh-button">
+            Refresh Payment Methods
+          </button>
+
+          <div id="payment-methods-status" class="status"></div>
+        </div>
+      </div>
+
+      <div class="demo-notice">
+        <h3>RootPay Demo Instructions</h3>
+        <p><strong>Prerequisites:</strong></p>
+        <ol>
+          <li>You must have a RootPay account to use this demo</li>
+          <li>You need an API Key from your RootPay account</li>
+          <li>You need a specific payee ID from your RootPay account</li>
+          <li>
+            Generate a session token using the token endpoint (see documentation
+            at
+            <a href="https://docs.root.credit" target="_blank"
+              >docs.root.credit</a
+            >)
+          </li>
+        </ol>
+        <p><strong>Features:</strong></p>
+        <ul>
+          <li>
+            <strong>Confirmation Fields:</strong> Both card number and account
+            number have confirmation fields to prevent typos
+          </li>
+          <li>
+            <strong>Real-time Validation:</strong> The submit button is only
+            enabled when all fields are valid and confirmation fields match
+          </li>
+          <li>
+            <strong>Secure Input:</strong> All sensitive data is handled in
+            secure iframes
+          </li>
+        </ul>
+        <p><strong>Test Values:</strong></p>
+        <ul>
+          <li>
+            <strong>Card:</strong> 4111 1111 1111 1111 with any future expiry
+            date
+          </li>
+          <li><strong>Account Number:</strong> 1234567890</li>
+          <li><strong>Routing Number:</strong> 111000025</li>
+        </ul>
       </div>
     </div>
-    
-    <div class="demo-notice">
-      <h3>RootPay Demo Instructions</h3>
-      <p><strong>Prerequisites:</strong></p>
-      <ol>
-        <li>You must have a RootPay account to use this demo</li>
-        <li>You need an API Key from your RootPay account</li>
-        <li>You need a specific payee ID from your RootPay account</li>
-        <li>Generate a session token using the token endpoint (see documentation at <a href="https://docs.root.credit" target="_blank">docs.root.credit</a>)</li>
-      </ol>
-      <p><strong>Features:</strong></p>
-      <ul>
-        <li><strong>Confirmation Fields:</strong> Both card number and account number have confirmation fields to prevent typos</li>
-        <li><strong>Real-time Validation:</strong> The submit button is only enabled when all fields are valid and confirmation fields match</li>
-        <li><strong>Secure Input:</strong> All sensitive data is handled in secure iframes</li>
-      </ul>
-      <p><strong>Test Values:</strong></p>
-      <ul>
-        <li><strong>Card:</strong> 4111 1111 1111 1111 with any future expiry date</li>
-        <li><strong>Account Number:</strong> 1234567890</li>
-        <li><strong>Routing Number:</strong> 111000025</li>
-      </ul>
-    </div>
-  </div>
-  
-  <!-- Include the RootPay SDK -->
-  <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script>
-  
-  <script>
-    // ===================================================
-    // DOM ELEMENTS & STATE
-    // ===================================================
-    
-    // Elements
-    const elements = {
-      setupForm: document.getElementById('setup-form'),
-      mainUi: document.getElementById('main-ui'),
-      tokenInput: document.getElementById('token'),
-      payeeIdInput: document.getElementById('payee-id'),
-      initializeBtn: document.getElementById('initialize-btn'),
-      paymentButton: document.getElementById('payment-button'),
-      paymentStatus: document.getElementById('payment-status'),
-      responseDetails: document.getElementById('response-details'),
-      cardFields: document.getElementById('card-fields'),
-      bankFields: document.getElementById('bank-fields'),
-      // Payment methods elements
-      paymentMethodsList: document.getElementById('payment-methods-list'),
-      refreshPaymentMethodsBtn: document.getElementById('refresh-payment-methods'),
-      paymentMethodsStatus: document.getElementById('payment-methods-status')
-    };
-    
-    // State
-    const state = {
-      rootpay: null,
-      fields: {
-        cardNumber: null,
-        cardExpiry: null,
-        confirmCardNumber: null,
-        accountNumber: null,
-        routingNumber: null,
-        confirmAccountNumber: null
-      },
-      paymentType: 'card',
-      validation: {
-        cardNumber: false,
-        cardExpiry: false,
-        confirmCardNumber: false,
-        accountNumber: false,
-        routingNumber: false,
-        confirmAccountNumber: false
-      },
-      refreshInProgress: false,
-      submitInProgress: false,
-      lastPaymentMethodsUpdate: 0,
-      initializing: false,
-      paymentMethodsInitialized: false,
-      validationTimeout: null
-    };
-    
-    // ===================================================
-    // DEFAULT FIELD STYLES
-    // ===================================================
-    
-    const defaultStyles = {
-      cardNumber: {
-        fontSize: '18px',
-        fontWeight: '500',
-        color: '#333',
-        letterSpacing: '1px'
-      },
-      cardExpiry: {
-        fontSize: '18px',
-        fontWeight: '500',
-        color: '#333'
-      }
-    };
-    
-    // ===================================================
-    // UI MANAGEMENT
-    // ===================================================
-    
-    /**
-     * Update submit button state based on validation with debouncing
-     */
-    function updateSubmitButtonState() {
-      // Clear any existing timeout
-      if (state.validationTimeout) {
-        clearTimeout(state.validationTimeout);
-      }
-      
-      // Add a small delay to debounce rapid validation changes
-      state.validationTimeout = setTimeout(function() {
-        const isValid = state.paymentType === 'card'
-          ? (state.validation.cardNumber && state.validation.cardExpiry && state.validation.confirmCardNumber)
-          : (state.validation.accountNumber && state.validation.routingNumber && state.validation.confirmAccountNumber);
-        
-        // Only change button state if it's different from current state
-        const currentlyDisabled = elements.paymentButton.disabled;
-        const shouldBeDisabled = !isValid;
-        
-        if (currentlyDisabled !== shouldBeDisabled) {
-          elements.paymentButton.disabled = shouldBeDisabled;
-          elements.paymentButton.style.opacity = isValid ? '1' : '0.5';
-          elements.paymentButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
-          
-          console.log('Form validation (debounced):', isValid ? 'Valid' : 'Invalid');
+
+    <!-- Include the RootPay SDK -->
+    <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script>
+    <script>
+      // ===================================================
+      // DOM ELEMENTS & STATE
+      // ===================================================
+
+      // Elements
+      const elements = {
+        setupForm: document.getElementById("setup-form"),
+        mainUi: document.getElementById("main-ui"),
+        tokenInput: document.getElementById("token"),
+        partyId: document.getElementById("party-id"),
+        initializeBtn: document.getElementById("initialize-btn"),
+        paymentButton: document.getElementById("payment-button"),
+        paymentStatus: document.getElementById("payment-status"),
+        responseDetails: document.getElementById("response-details"),
+        cardFields: document.getElementById("card-fields"),
+        bankFields: document.getElementById("bank-fields"),
+        // Payment methods elements
+        paymentMethodsList: document.getElementById("payment-methods-list"),
+        refreshPaymentMethodsBtn: document.getElementById(
+          "refresh-payment-methods"
+        ),
+        paymentMethodsStatus: document.getElementById("payment-methods-status"),
+        paymentType: document.querySelector(".payment-type-selector"),
+      };
+
+      // State
+      const state = {
+        rootpay: null,
+        fields: {
+          cardNumber: null,
+          cardExpiry: null,
+          confirmCardNumber: null,
+          accountNumber: null,
+          routingNumber: null,
+          confirmAccountNumber: null,
+        },
+        paymentType: "card",
+        validation: {
+          cardNumber: false,
+          cardExpiry: false,
+          confirmCardNumber: false,
+          accountNumber: false,
+          routingNumber: false,
+          confirmAccountNumber: false,
+        },
+        refreshInProgress: false,
+        submitInProgress: false,
+        lastPaymentMethodsUpdate: 0,
+        initializing: false,
+        paymentMethodsInitialized: false,
+        validationTimeout: null,
+        userType: "payee",
+      };
+
+      // ===================================================
+      // DEFAULT FIELD STYLES
+      // ===================================================
+
+      const defaultStyles = {
+        cardNumber: {
+          fontSize: "18px",
+          fontWeight: "500",
+          color: "#333",
+          letterSpacing: "1px",
+        },
+        cardExpiry: {
+          fontSize: "18px",
+          fontWeight: "500",
+          color: "#333",
+        },
+      };
+
+      // ===================================================
+      // UI MANAGEMENT
+      // ===================================================
+
+      /**
+       * Update submit button state based on validation with debouncing
+       */
+      function updateSubmitButtonState() {
+        // Clear any existing timeout
+        if (state.validationTimeout) {
+          clearTimeout(state.validationTimeout);
         }
-      }, 50); // Shorter delay for web version
-    }
-    
-    /**
-     * Show status message
-     */
-    function showStatus(message, type) {
-      elements.paymentStatus.textContent = message;
-      elements.paymentStatus.className = `status ${type}`;
-      elements.paymentStatus.style.display = 'block';
-      
-      // Auto-hide success messages
-      if (type === 'success') {
-        setTimeout(() => {
-          if (elements.paymentStatus.textContent === message) {
-            elements.paymentStatus.style.display = 'none';
+
+        // Add a small delay to debounce rapid validation changes
+        state.validationTimeout = setTimeout(function () {
+          const isValid =
+            state.paymentType === "card"
+              ? state.validation.cardNumber &&
+                state.validation.cardExpiry &&
+                state.validation.confirmCardNumber
+              : state.validation.accountNumber &&
+                state.validation.routingNumber &&
+                state.validation.confirmAccountNumber;
+
+          console.log(
+            "::current isValid is ",
+            isValid,
+            JSON.stringify(state),
+            state.validation.cardNumber,
+            state.validation.cardExpiry,
+            state.validation.confirmCardNumber
+          );
+
+          // Only change button state if it's different from current state
+          const currentlyDisabled = elements.paymentButton.disabled;
+          const shouldBeDisabled = !isValid;
+
+          if (currentlyDisabled !== shouldBeDisabled) {
+            elements.paymentButton.disabled = shouldBeDisabled;
+            elements.paymentButton.style.opacity = isValid ? "1" : "0.5";
+            elements.paymentButton.style.cursor = isValid
+              ? "pointer"
+              : "not-allowed";
+
+            console.log(
+              "Form validation (debounced):",
+              isValid ? "Valid" : "Invalid"
+            );
           }
-        }, 5000);
+        }, 50); // Shorter delay for web version
       }
-    }
-    
-    /**
-     * Show status message in payment methods section
-     */
-    function showPaymentMethodsStatus(message, type) {
-      elements.paymentMethodsStatus.textContent = message;
-      elements.paymentMethodsStatus.className = `status ${type}`;
-      elements.paymentMethodsStatus.style.display = 'block';
-      
-      // Auto-hide success messages
-      if (type === 'success') {
-        setTimeout(() => {
-          if (elements.paymentMethodsStatus.textContent === message) {
-            elements.paymentMethodsStatus.style.display = 'none';
-          }
-        }, 5000);
-      }
-    }
-    
-    /**
-     * Clear status message
-     */
-    function clearStatus() {
-      elements.paymentStatus.style.display = 'none';
-      elements.paymentStatus.textContent = '';
-      elements.paymentStatus.className = 'status';
-    }
-    
-    /**
-     * Format error details for display
-     */
-    function formatErrorDetails(response) {
-      if (typeof response !== 'object' || response === null) {
-        return JSON.stringify(response, null, 2);
-      }
-      
-      let result = '';
-      
-      if (response.status) {
-        result += `Status Code: ${response.status}\n\n`;
-      }
-      
-      if (response.error) {
-        result += `Error: ${response.error}\n\n`;
-      }
-      
-      if (response.details) {
-        result += 'Details:\n' + JSON.stringify(response.details, null, 2);
-      } else {
-        result += 'Full Response:\n' + JSON.stringify(response, null, 2);
-      }
-      
-      return result;
-    }
-    
-    /**
-     * Display API response details
-     */
-    function displayResponseDetails(response, isSuccess) {
-      // Format and show the response
-      if (isSuccess) {
-        elements.responseDetails.textContent = JSON.stringify(response, null, 2);
-        elements.responseDetails.classList.remove('error');
-        elements.responseDetails.classList.add('success');
-      } else {
-        elements.responseDetails.textContent = formatErrorDetails(response);
-        elements.responseDetails.classList.remove('success');
-        elements.responseDetails.classList.add('error');
-      }
-      
-      elements.responseDetails.style.display = 'block';
-    }
-    
-    // ===================================================
-    // FIELD CREATION
-    // ===================================================
-    
-    /**
-     * Create card payment fields
-     */
-    function createCardFields() {
-      if (!state.fields.cardNumber) {
-        state.fields.cardNumber = state.rootpay.field('#card-number-container', {
-          type: 'card-number',
-          name: 'card-number',
-          style: defaultStyles.cardNumber,
-          onValidChange: function(isValid) {
-            state.validation.cardNumber = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-      
-      if (!state.fields.confirmCardNumber) {
-        state.fields.confirmCardNumber = state.rootpay.field('#confirm-card-number-container', {
-          type: 'confirm-card-number',
-          name: 'confirm-card-number',
-          style: defaultStyles.cardNumber,
-          placeholder: 'Re-enter card number',
-          onValidChange: function(isValid) {
-            state.validation.confirmCardNumber = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-      
-      if (!state.fields.cardExpiry) {
-        state.fields.cardExpiry = state.rootpay.field('#card-expiry-container', {
-          type: 'card-expiry',
-          name: 'card-expiry',
-          style: defaultStyles.cardExpiry,
-          onValidChange: function(isValid) {
-            state.validation.cardExpiry = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-    }
-    
-    /**
-     * Create bank payment fields
-     */
-    function createBankFields() {
-      if (!state.fields.accountNumber) {
-        state.fields.accountNumber = state.rootpay.field('#account-number-container', {
-          type: 'account-number',
-          name: 'account-number',
-          style: defaultStyles.cardNumber,
-          onValidChange: function(isValid) {
-            state.validation.accountNumber = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-      
-      if (!state.fields.confirmAccountNumber) {
-        state.fields.confirmAccountNumber = state.rootpay.field('#confirm-account-number-container', {
-          type: 'confirm-account-number',
-          name: 'confirm-account-number',
-          style: defaultStyles.cardNumber,
-          placeholder: 'Re-enter account number',
-          onValidChange: function(isValid) {
-            state.validation.confirmAccountNumber = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-      
-      if (!state.fields.routingNumber) {
-        state.fields.routingNumber = state.rootpay.field('#routing-number-container', {
-          type: 'routing-number',
-          name: 'routing-number',
-          style: defaultStyles.cardExpiry,
-          onValidChange: function(isValid) {
-            state.validation.routingNumber = isValid;
-            updateSubmitButtonState();
-          }
-        });
-      }
-    }
-    
-    // ===================================================
-    // PAYMENT METHODS MANAGEMENT
-    // ===================================================
-    
-    /**
-     * Render payment methods
-     */
-    function renderPaymentMethods(paymentMethods) {
-      // Check if response contains data array
-      if (paymentMethods.data) {
-        paymentMethods = paymentMethods.data;
-      }
-      
-      if (!paymentMethods || paymentMethods.length === 0) {
-        elements.paymentMethodsList.innerHTML = '<p>No payment methods available.</p>';
-        return;
-      }
-      
-      let html = '';
-      
-      paymentMethods.forEach(method => {
-        let methodDetails = '';
-        let paymentType = '';
-        
-        // Determine payment method type from available fields
-        if (method.card_last_four) {
-          paymentType = 'card';
-          const expiry = method.card_expiry_date || '';
-          const expiryMonth = expiry.substring(0, 2);
-          const expiryYear = expiry.substring(2);
-          
-          methodDetails = `•••• ${method.card_last_four} (expires ${expiryMonth}/${expiryYear})`;
-        } 
-        else if (method.account_last_four) {
-          paymentType = 'bank';
-          methodDetails = `Account •••• ${method.account_last_four}`;
-          
-          if (method.routing_number) {
-            methodDetails += ` · Routing: ${method.routing_number}`;
-          }
+
+      /**
+       * Show status message
+       */
+      function showStatus(message, type) {
+        elements.paymentStatus.textContent = message;
+        elements.paymentStatus.className = `status ${type}`;
+        elements.paymentStatus.style.display = "block";
+
+        // Auto-hide success messages
+        if (type === "success") {
+          setTimeout(() => {
+            if (elements.paymentStatus.textContent === message) {
+              elements.paymentStatus.style.display = "none";
+            }
+          }, 5000);
         }
-        
-        // Add verification status badge
-        let verificationBadge = '';
-        if (method.verification_status) {
-          const statusClass = method.verification_status === 'verified' ? 'verified' : 'pending';
-          verificationBadge = `<span class="verification-badge ${statusClass}">${method.verification_status}</span>`;
+      }
+
+      /**
+       * Show status message in payment methods section
+       */
+      function showPaymentMethodsStatus(message, type) {
+        elements.paymentMethodsStatus.textContent = message;
+        elements.paymentMethodsStatus.className = `status ${type}`;
+        elements.paymentMethodsStatus.style.display = "block";
+
+        // Auto-hide success messages
+        if (type === "success") {
+          setTimeout(() => {
+            if (elements.paymentMethodsStatus.textContent === message) {
+              elements.paymentMethodsStatus.style.display = "none";
+            }
+          }, 5000);
         }
-        
-        // Add warning if present
-        let warningMessage = '';
-        if (method.warning) {
-          warningMessage = `<div class="payment-method-warning">${method.warning}</div>`;
+      }
+
+      /**
+       * Clear status message
+       */
+      function clearStatus() {
+        elements.paymentStatus.style.display = "none";
+        elements.paymentStatus.textContent = "";
+        elements.paymentStatus.className = "status";
+      }
+
+      /**
+       * Format error details for display
+       */
+      function formatErrorDetails(response) {
+        if (typeof response !== "object" || response === null) {
+          return JSON.stringify(response, null, 2);
         }
-        
-        // Build supported rails/payment methods
-        let supportedRails = '';
-        if (method.supported_rails && method.supported_rails.length > 0) {
-          supportedRails = `<div class="supported-rails">
-            ${method.supported_rails.map(rail => `<span class="rail">${formatRailName(rail)}</span>`).join('')}
+
+        let result = "";
+
+        if (response.status) {
+          result += `Status Code: ${response.status}\n\n`;
+        }
+
+        if (response.error) {
+          result += `Error: ${response.error}\n\n`;
+        }
+
+        if (response.details) {
+          result += "Details:\n" + JSON.stringify(response.details, null, 2);
+        } else {
+          result += "Full Response:\n" + JSON.stringify(response, null, 2);
+        }
+
+        return result;
+      }
+
+      /**
+       * Display API response details
+       */
+      function displayResponseDetails(response, isSuccess) {
+        // Format and show the response
+        if (isSuccess) {
+          elements.responseDetails.textContent = JSON.stringify(
+            response,
+            null,
+            2
+          );
+          elements.responseDetails.classList.remove("error");
+          elements.responseDetails.classList.add("success");
+        } else {
+          elements.responseDetails.textContent = formatErrorDetails(response);
+          elements.responseDetails.classList.remove("success");
+          elements.responseDetails.classList.add("error");
+        }
+
+        elements.responseDetails.style.display = "block";
+      }
+
+      // ===================================================
+      // FIELD CREATION
+      // ===================================================
+
+      /**
+       * Create card payment fields
+       */
+      function createCardFields() {
+        if (!state.fields.cardNumber) {
+          state.fields.cardNumber = state.rootpay.field(
+            "#card-number-container",
+            {
+              type: "card-number",
+              name: "card-number",
+              style: defaultStyles.cardNumber,
+              onValidChange: function (isValid) {
+                state.validation.cardNumber = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+
+        if (!state.fields.confirmCardNumber) {
+          state.fields.confirmCardNumber = state.rootpay.field(
+            "#confirm-card-number-container",
+            {
+              type: "confirm-card-number",
+              name: "confirm-card-number",
+              style: defaultStyles.cardNumber,
+              placeholder: "Re-enter card number",
+              onValidChange: function (isValid) {
+                console.log("::I was called, I have to update valid state");
+                state.validation.confirmCardNumber = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+
+        if (!state.fields.cardExpiry) {
+          state.fields.cardExpiry = state.rootpay.field(
+            "#card-expiry-container",
+            {
+              type: "card-expiry",
+              name: "card-expiry",
+              style: defaultStyles.cardExpiry,
+              onValidChange: function (isValid) {
+                state.validation.cardExpiry = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+      }
+
+      /**
+       * Create bank payment fields
+       */
+      function createBankFields() {
+        if (!state.fields.accountNumber) {
+          state.fields.accountNumber = state.rootpay.field(
+            "#account-number-container",
+            {
+              type: "account-number",
+              name: "account-number",
+              style: defaultStyles.cardNumber,
+              onValidChange: function (isValid) {
+                state.validation.accountNumber = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+
+        if (!state.fields.confirmAccountNumber) {
+          state.fields.confirmAccountNumber = state.rootpay.field(
+            "#confirm-account-number-container",
+            {
+              type: "confirm-account-number",
+              name: "confirm-account-number",
+              style: defaultStyles.cardNumber,
+              placeholder: "Re-enter account number",
+              onValidChange: function (isValid) {
+                state.validation.confirmAccountNumber = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+
+        if (!state.fields.routingNumber) {
+          state.fields.routingNumber = state.rootpay.field(
+            "#routing-number-container",
+            {
+              type: "routing-number",
+              name: "routing-number",
+              style: defaultStyles.cardExpiry,
+              onValidChange: function (isValid) {
+                state.validation.routingNumber = isValid;
+                updateSubmitButtonState();
+              },
+            }
+          );
+        }
+      }
+
+      // ===================================================
+      // PAYMENT METHODS MANAGEMENT
+      // ===================================================
+
+      /**
+       * Render payment methods
+       */
+      function renderPaymentMethods(paymentMethods) {
+        // Check if response contains data array
+        if (paymentMethods.data) {
+          paymentMethods = paymentMethods.data;
+        }
+
+        if (!paymentMethods || paymentMethods.length === 0) {
+          elements.paymentMethodsList.innerHTML =
+            "<p>No payment methods available.</p>";
+          return;
+        }
+
+        let html = "";
+
+        paymentMethods.forEach((method) => {
+          let methodDetails = "";
+          let paymentType = "";
+
+          // Determine payment method type from available fields
+          if (method.card_last_four) {
+            paymentType = "card";
+            const expiry = method.card_expiry_date || "";
+            const expiryMonth = expiry.substring(0, 2);
+            const expiryYear = expiry.substring(2);
+
+            methodDetails = `•••• ${method.card_last_four} (expires ${expiryMonth}/${expiryYear})`;
+          } else if (method.account_last_four) {
+            paymentType = "bank";
+            methodDetails = `Account •••• ${method.account_last_four}`;
+
+            if (method.routing_number) {
+              methodDetails += ` · Routing: ${method.routing_number}`;
+            }
+          }
+
+          // Add verification status badge
+          let verificationBadge = "";
+          if (method.verification_status) {
+            const statusClass =
+              method.verification_status === "verified"
+                ? "verified"
+                : "pending";
+            verificationBadge = `<span class="verification-badge ${statusClass}">${method.verification_status}</span>`;
+          }
+
+          // Add warning if present
+          let warningMessage = "";
+          if (method.warning) {
+            warningMessage = `<div class="payment-method-warning">${method.warning}</div>`;
+          }
+
+          // Build supported rails/payment methods
+          let supportedRails = "";
+          if (method.supported_rails && method.supported_rails.length > 0) {
+            supportedRails = `<div class="supported-rails">
+            ${method.supported_rails
+              .map(
+                (rail) => `<span class="rail">${formatRailName(rail)}</span>`
+              )
+              .join("")}
           </div>`;
-        }
-        
-        // Add default indicator
-        let defaultIndicator = '';
-        if (method.is_default) {
-          defaultIndicator = '<span class="default-badge">Default</span>';
-        }
-        
-        html += `
+          }
+
+          // Add default indicator
+          let defaultIndicator = "";
+          if (method.is_default) {
+            defaultIndicator = '<span class="default-badge">Default</span>';
+          }
+
+          html += `
           <div class="payment-method">
             <div class="payment-method-details">
               <div class="payment-method-header">
-                <div class="payment-method-type">${formatPaymentType(paymentType)}</div>
+                <div class="payment-method-type">${formatPaymentType(
+                  paymentType
+                )}</div>
                 ${defaultIndicator}
                 ${verificationBadge}
               </div>
@@ -468,282 +572,347 @@
             </div>
           </div>
         `;
-      });
-      
-      elements.paymentMethodsList.innerHTML = html;
-    }
-    
-    /**
-     * Format rail name to be more user-friendly
-     */
-    function formatRailName(rail) {
-      const railNames = {
-        'same_day_ach': 'Same-day ACH',
-        'standard_ach': 'Standard ACH',
-        'wire': 'Wire Transfer',
-        'instant_bank': 'Instant Bank',
-        'instant_card': 'Instant Card'
-      };
-      
-      return railNames[rail] || rail;
-    }
-    
-    /**
-     * Format payment type
-     */
-    function formatPaymentType(type) {
-      const types = {
-        'card': 'Debit Card',
-        'bank': 'Bank Account'
-      };
-      
-      return types[type] || type;
-    }
-    
-    /**
-     * Refresh payment methods
-     * @param {Function} callback - Optional callback function
-     */
-    function refreshPaymentMethods(callback) {
-      if (!state.rootpay) {
-        showStatus('RootPay not initialized', 'error');
-        return;
-      }
-      
-      // Set a flag to indicate a refresh is in progress to prevent loops
-      if (state.refreshInProgress) {
-        console.log('Payment methods refresh already in progress');
-        return;
-      }
-      
-      state.refreshInProgress = true;
-      elements.refreshPaymentMethodsBtn.disabled = true;
-      elements.refreshPaymentMethodsBtn.textContent = 'Refreshing...';
-      
-      // Ensure callback is a function
-      const safeCallback = typeof callback === 'function' ? callback : function() {};
-      
-      state.rootpay.getPaymentMethods(function(error, paymentMethods) {
-        state.refreshInProgress = false;
-        elements.refreshPaymentMethodsBtn.disabled = false;
-        elements.refreshPaymentMethodsBtn.textContent = 'Refresh Payment Methods';
-        
-        if (error) {
-          showPaymentMethodsStatus('Error refreshing payment methods: ' + error, 'error');
-        } else {
-          // Only show a status message if this was a manual refresh (button click)
-          // but not during initialization or automatic refreshes
-          if (!state.initializing && !state.submitInProgress) {
-            showPaymentMethodsStatus('Payment methods refreshed', 'success');
-          }
-        }
-        
-        safeCallback(error, paymentMethods);
-      });
-    }
-    
-    /**
-     * Custom handler for payment methods update
-     */
-    function handlePaymentMethodsUpdate(paymentMethods) {
-      // Log the actual data received for debugging
-      console.log('Received payment methods data:', paymentMethods);
-      
-      // Always process the first update or when requested
-      if (state.refreshInProgress || state.submitInProgress || state.initializing || !state.paymentMethodsInitialized) {
-        console.log('Processing payment methods update:', 
-          state.refreshInProgress ? 'explicit refresh' : 
-          state.submitInProgress ? 'after submission' : 
-          state.initializing ? 'during initialization' : 
-          'first update');
-        
-        state.lastPaymentMethodsUpdate = Date.now();
-        state.paymentMethodsInitialized = true;
-        
-        // Check if the data is in the expected format
-        if (paymentMethods && (Array.isArray(paymentMethods) || (paymentMethods.data && Array.isArray(paymentMethods.data)))) {
-          renderPaymentMethods(paymentMethods);
-        } else {
-          console.error('Invalid payment methods data format:', paymentMethods);
-          // Handle the case where data format is incorrect
-          elements.paymentMethodsList.innerHTML = '<p>Error: Invalid payment methods data format</p>';
-        }
-      } else {
-        console.log('Ignoring automatic payment methods update from iframe');
-      }
-    }
-    
-    // ===================================================
-    // EVENT HANDLERS
-    // ===================================================
-    
-    /**
-     * Initialize RootPay
-     */
-    function initializeRootPay() {
-      const token = elements.tokenInput.value.trim();
-      const payeeId = elements.payeeIdInput.value.trim();
-      
-      if (!token) {
-        showStatus('Please enter a valid token', 'error');
-        return;
-      }
-      
-      if (!payeeId) {
-        showStatus('Please enter a valid payee ID', 'error');
-        return;
-      }
-      
-      try {
-        // Set initializing flag to true
-        state.initializing = true;
-        
-        // Initialize RootPay instance
-        state.rootpay = RootPay.init({
-          token: token,
-          payee_id: payeeId,
-          debug: true,
-          onSuccess: function(response) {
-            // Only show success message for payment method submission
-            // This callback will be triggered by other successful operations too,
-            // but we only want to show this specific message for submissions
-            if (state.submitInProgress) {
-              showStatus('Payment method added successfully!', 'success');
-              // Don't display raw response details anymore
-            }
-          },
-          onError: function(errorMessage, errorDetails) {
-            showStatus('Error: ' + errorMessage, 'error');
-            displayResponseDetails(errorDetails, false);
-          },
-          onPaymentMethodsUpdate: handlePaymentMethodsUpdate
         });
-        
-        // Create initial card fields
-        createCardFields();
-        
-        // Show main UI, hide setup form
-        elements.setupForm.classList.add('hidden');
-        elements.mainUi.classList.remove('hidden');
-        
-        // Ensure button is initially disabled
-        elements.paymentButton.disabled = true;
-        elements.paymentButton.style.opacity = '0.5';
-        elements.paymentButton.style.cursor = 'not-allowed';
-        
-        // Add a loading indicator for payment methods
-        elements.paymentMethodsList.innerHTML = '<p>Loading payment methods...</p>';
-        
-        // Initial fetch of payment methods with a delay to allow iframe to initialize
-        setTimeout(() => {
-          refreshPaymentMethods(function(error, paymentMethods) {
-            // Reset initializing flag
-            state.initializing = false;
-            
-            if (error) {
-              console.warn('Initial payment methods fetch failed:', error);
-              elements.paymentMethodsList.innerHTML = 
-                '<p>Could not load payment methods. <button id="retry-payment-methods" class="refresh-button">Try Again</button></p>';
-              
-              // Add event listener for the retry button
-              document.getElementById('retry-payment-methods').addEventListener('click', refreshPaymentMethods);
-            }
-          });
-        }, 1500); // Delay initial fetch to ensure iframe is ready
-        
-        console.log('RootPay initialized successfully');
-      } catch (error) {
-        state.initializing = false;
-        showStatus('Error initializing RootPay: ' + error.message, 'error');
-        console.error('Initialization error:', error);
+
+        elements.paymentMethodsList.innerHTML = html;
       }
-    }
-    
-    /**
-     * Handle payment method switch
-     */
-    function handlePaymentMethodSwitch(e) {
-      state.paymentType = e.target.value;
-      
-      if (state.paymentType === 'card') {
-        elements.cardFields.style.display = '';
-        elements.bankFields.style.display = 'none';
-        createCardFields();
-      } else {
-        elements.cardFields.style.display = 'none';
-        elements.bankFields.style.display = '';
-        createBankFields();
+
+      /**
+       * Format rail name to be more user-friendly
+       */
+      function formatRailName(rail) {
+        const railNames = {
+          same_day_ach: "Same-day ACH",
+          standard_ach: "Standard ACH",
+          wire: "Wire Transfer",
+          instant_bank: "Instant Bank",
+          instant_card: "Instant Card",
+        };
+
+        return railNames[rail] || rail;
       }
-      
-      updateSubmitButtonState();
-    }
-    
-    /**
-     * Submit payment method
-     */
-    function submitPaymentMethod() {
-      if (!state.rootpay) {
-        showStatus('RootPay not initialized', 'error');
-        return;
+
+      /**
+       * Format payment type
+       */
+      function formatPaymentType(type) {
+        const types = {
+          card: "Debit Card",
+          bank: "Bank Account",
+        };
+
+        return types[type] || type;
       }
-      
-      if (elements.paymentButton.disabled) {
-        showStatus('Please fill in all required fields correctly', 'error');
-        return;
-      }
-      
-      clearStatus();
-      elements.responseDetails.style.display = 'none';
-      
-      showStatus('Processing payment method...', 'info');
-      
-      // Set the submit flag to allow payment method updates
-      state.submitInProgress = true;
-      
-      state.rootpay.submitPaymentMethod(function(status, response) {
-        console.log('Submission status:', status);
-        
-        if (status === 201) {
-          showStatus('Payment method added successfully!', 'success');
-          
-          // Hide response details for successful submissions since we show the payment methods list
-          // Data is still available in the SDK if needed
-          
-          // Explicitly refresh payment methods after successful submission
-          refreshPaymentMethods(function() {
-            state.submitInProgress = false;
-          });
-        } else {
-          const errorMessage = response.error || 'Unknown error';
-          const statusCode = response.status || status;
-          showStatus(`Error ${statusCode}: ${errorMessage}`, 'error');
-          displayResponseDetails(response, false);
-          state.submitInProgress = false;
+
+      /**
+       * Refresh payment methods
+       * @param {Function} callback - Optional callback function
+       */
+      function refreshPaymentMethods(callback) {
+        if (!state.rootpay) {
+          showStatus("RootPay not initialized", "error");
+          return;
         }
-      }, state.paymentType);
-    }
-    
-    // ===================================================
-    // EVENT LISTENERS
-    // ===================================================
-    
-    // Initialize everything when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      // Ensure button is disabled initially
-      elements.paymentButton.disabled = true;
-      elements.paymentButton.style.opacity = '0.5';
-      elements.paymentButton.style.cursor = 'not-allowed';
-      
-      // Set up event listeners
-      elements.initializeBtn.addEventListener('click', initializeRootPay);
-      elements.paymentButton.addEventListener('click', submitPaymentMethod);
-      elements.refreshPaymentMethodsBtn.addEventListener('click', refreshPaymentMethods);
-      
-      // Payment method selection
-      document.querySelectorAll('input[name="payment-method-type"]').forEach(radio => {
-        radio.addEventListener('change', handlePaymentMethodSwitch);
+
+        // Set a flag to indicate a refresh is in progress to prevent loops
+        if (state.refreshInProgress) {
+          console.log("Payment methods refresh already in progress");
+          return;
+        }
+
+        state.refreshInProgress = true;
+        elements.refreshPaymentMethodsBtn.disabled = true;
+        elements.refreshPaymentMethodsBtn.textContent = "Refreshing...";
+
+        // Ensure callback is a function
+        const safeCallback =
+          typeof callback === "function" ? callback : function () {};
+
+        state.rootpay.getPaymentMethods(function (error, paymentMethods) {
+          state.refreshInProgress = false;
+          elements.refreshPaymentMethodsBtn.disabled = false;
+          elements.refreshPaymentMethodsBtn.textContent =
+            "Refresh Payment Methods";
+
+          if (error) {
+            showPaymentMethodsStatus(
+              "Error refreshing payment methods: " + error.message,
+              "error"
+            );
+          } else {
+            // Only show a status message if this was a manual refresh (button click)
+            // but not during initialization or automatic refreshes
+            if (!state.initializing && !state.submitInProgress) {
+              showPaymentMethodsStatus("Payment methods refreshed", "success");
+            }
+          }
+
+          safeCallback(error, paymentMethods);
+        });
+      }
+
+      /**
+       * Custom handler for payment methods update
+       */
+      function handlePaymentMethodsUpdate(paymentMethods) {
+        // Log the actual data received for debugging
+        console.log("Received payment methods data:", paymentMethods);
+
+        // Always process the first update or when requested
+        if (
+          state.refreshInProgress ||
+          state.submitInProgress ||
+          state.initializing ||
+          !state.paymentMethodsInitialized
+        ) {
+          console.log(
+            "Processing payment methods update:",
+            state.refreshInProgress
+              ? "explicit refresh"
+              : state.submitInProgress
+              ? "after submission"
+              : state.initializing
+              ? "during initialization"
+              : "first update"
+          );
+
+          state.lastPaymentMethodsUpdate = Date.now();
+          state.paymentMethodsInitialized = true;
+
+          // Check if the data is in the expected format
+          if (
+            paymentMethods &&
+            (Array.isArray(paymentMethods) ||
+              (paymentMethods.data && Array.isArray(paymentMethods.data)))
+          ) {
+            renderPaymentMethods(paymentMethods);
+          } else {
+            console.error(
+              "Invalid payment methods data format:",
+              paymentMethods
+            );
+            // Handle the case where data format is incorrect
+            elements.paymentMethodsList.innerHTML =
+              "<p>Error: Invalid payment methods data format</p>";
+          }
+        } else {
+          console.log("Ignoring automatic payment methods update from iframe");
+        }
+      }
+
+      // ===================================================
+      // EVENT HANDLERS
+      // ===================================================
+
+      /**
+       * Initialize RootPay
+       */
+      function initializeRootPay() {
+        const token = elements.tokenInput.value.trim();
+        const partyId = elements.partyId.value.trim();
+
+        if (!token) {
+          showStatus("Please enter a valid token", "error");
+          return;
+        }
+
+        if (!partyId) {
+          showStatus("Please enter a valid party ID", "error");
+          return;
+        }
+
+        try {
+          // Set initializing flag to true
+          state.initializing = true;
+
+          // Create SDK options
+          const options = {
+            token: token,
+            debug: true,
+            onSuccess: function (response) {
+              // Only show success message for payment method submission
+              // This callback will be triggered by other successful operations too,
+              // but we only want to show this specific message for submissions
+              if (state.submitInProgress) {
+                showStatus("Payment method added successfully!", "success");
+                // Don't display raw response details anymore
+              }
+            },
+            onError: function (errorMessage, errorDetails) {
+              showStatus("Error: " + errorMessage, "error");
+              displayResponseDetails(errorDetails, false);
+            },
+            onPaymentMethodsUpdate: handlePaymentMethodsUpdate,
+          };
+
+          if (state.userType === "payee") {
+            options.payee_id = partyId;
+          } else if (state.userType === "payer") {
+            options.payer_id = partyId;
+          }
+
+          // Initialize RootPay instance
+          state.rootpay = RootPay.init(state.userType, options);
+
+          // Create initial card fields
+          if (state.userType === "payer") {
+            document
+              .querySelector('input[name="payment-method-type"][value="bank"]')
+              .click();
+            elements.paymentType.classList.add("hidden");
+          } else {
+            createCardFields();
+          }
+
+          // Show main UI, hide setup form
+          elements.setupForm.classList.add("hidden");
+          elements.mainUi.classList.remove("hidden");
+
+          // Ensure button is initially disabled
+          elements.paymentButton.disabled = true;
+          elements.paymentButton.style.opacity = "0.5";
+          elements.paymentButton.style.cursor = "not-allowed";
+
+          // Add a loading indicator for payment methods
+          elements.paymentMethodsList.innerHTML =
+            "<p>Loading payment methods...</p>";
+
+          // Initial fetch of payment methods with a delay to allow iframe to initialize
+          setTimeout(() => {
+            refreshPaymentMethods(function (error, paymentMethods) {
+              // Reset initializing flag
+              state.initializing = false;
+
+              if (error) {
+                console.warn("Initial payment methods fetch failed:", error);
+                elements.paymentMethodsList.innerHTML =
+                  '<p>Could not load payment methods. <button id="retry-payment-methods" class="refresh-button">Try Again</button></p>';
+
+                // Add event listener for the retry button
+                document
+                  .getElementById("retry-payment-methods")
+                  .addEventListener("click", refreshPaymentMethods);
+              }
+            });
+          }, 1500); // Delay initial fetch to ensure iframe is ready
+
+          console.log("RootPay initialized successfully");
+        } catch (error) {
+          state.initializing = false;
+          showStatus("Error initializing RootPay: " + error.message, "error");
+          console.error("Initialization error:", error);
+        }
+      }
+
+      /**
+       * Handle payment method switch
+       */
+      function handlePaymentMethodSwitch(e) {
+        state.paymentType = e.target.value;
+
+        if (state.paymentType === "card") {
+          elements.cardFields.style.display = "";
+          elements.bankFields.style.display = "none";
+          createCardFields();
+        } else {
+          elements.cardFields.style.display = "none";
+          elements.bankFields.style.display = "";
+          createBankFields();
+        }
+
+        updateSubmitButtonState();
+      }
+
+      /**
+       * Handle Flow Type
+       */
+      function handleuserTypeSwitch(e) {
+        state.userType = e.target.value;
+
+        if (state.userType === "payee") {
+          elements.partyId.placeholder = "Enter Payee Id";
+        } else {
+          elements.partyId.placeholder = "Enter Payer Id";
+        }
+      }
+
+      /**
+       * Submit payment method
+       */
+      function submitPaymentMethod() {
+        if (!state.rootpay) {
+          showStatus("RootPay not initialized", "error");
+          return;
+        }
+
+        if (elements.paymentButton.disabled) {
+          showStatus("Please fill in all required fields correctly", "error");
+          return;
+        }
+
+        clearStatus();
+        elements.responseDetails.style.display = "none";
+
+        showStatus("Processing payment method...", "info");
+
+        // Set the submit flag to allow payment method updates
+        state.submitInProgress = true;
+
+        state.rootpay.submitPaymentMethod(function (error, response) {
+          console.log("Submission status:", status);
+
+          if (response) {
+            showStatus("Payment method added successfully!", "success");
+
+            // Hide response details for successful submissions since we show the payment methods list
+            // Data is still available in the SDK if needed
+
+            // Explicitly refresh payment methods after successful submission
+            refreshPaymentMethods(function () {
+              state.submitInProgress = false;
+            });
+          } else {
+            const errorMessage = error.message || "Unknown error";
+            const statusCode = error.status;
+            showStatus(`Error ${statusCode}: ${errorMessage}`, "error");
+            displayResponseDetails(response, false);
+            state.submitInProgress = false;
+          }
+        }, state.paymentType);
+      }
+
+      // ===================================================
+      // EVENT LISTENERS
+      // ===================================================
+
+      // Initialize everything when DOM is ready
+      document.addEventListener("DOMContentLoaded", function () {
+        // Ensure button is disabled initially
+        elements.paymentButton.disabled = true;
+        elements.paymentButton.style.opacity = "0.5";
+        elements.paymentButton.style.cursor = "not-allowed";
+
+        // Set up event listeners
+        elements.initializeBtn.addEventListener("click", initializeRootPay);
+        elements.paymentButton.addEventListener("click", submitPaymentMethod);
+        elements.refreshPaymentMethodsBtn.addEventListener(
+          "click",
+          refreshPaymentMethods
+        );
+
+        // Payment method selection
+        document
+          .querySelectorAll('input[name="payment-method-type"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", handlePaymentMethodSwitch);
+          });
+
+        document
+          .querySelectorAll('input[name="user-type"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", handleuserTypeSwitch);
+          });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
