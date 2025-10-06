@@ -399,10 +399,6 @@ struct RootPayWebView: UIViewRepresentable {
             
             <!-- 🎯 Load RootPay SDK directly in JavaScript -->
             <script>
-                /**
-                * Handle Flow Type
-                */
-
                 // Load SDK dynamically and set up API debugging
                 (function() {
                     console.log('📦 Starting RootPay SDK loading process...');
@@ -523,7 +519,7 @@ struct RootPayWebView: UIViewRepresentable {
                     // Now load the SDK
                     const script = document.createElement('script');
         
-                    const versionTag = Date.now(); // Creating new url everytime to bust the cache, ios aggresive src.
+                    const versionTag = Date.now(); // Creating new url everytime to bust the cache, ios aggresive caches based on src.
                     script.src = `https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js?v=${versionTag}`;
         
                     script.onload = function() {
