@@ -297,13 +297,26 @@ struct RootPayWebView: UIViewRepresentable {
                 <!-- Setup Form -->
                 <div id="setup-form" class="hidden">
                     <div class="form-group">
+                        <label>
+                            <input type="radio" name="user-type" value="payee" checked />
+                            Payee
+                        </label>
+                        <label>
+                            <input type="radio" name="user-type" value="payer" />
+                            Payer
+                        </label>
+                    </div>
+
+                    
+
+                    <div class="form-group">
                         <label for="token">RootPay Token:</label>
                         <input type="text" id="token" placeholder="Enter your RootPay session token" value="test_token_12345">
                     </div>
                     
-                    <div class="form-group">
-                        <label for="payee-id">Payee ID:</label>
-                        <input type="text" id="payee-id" placeholder="Enter payee ID" value="test_payee_id">
+                    <div class="form-group party-group">
+                        <label for="party-id">Party ID:</label>
+                        <input type="text" id="party-id" placeholder="Enter Payee Id" />
                     </div>
                     
                     <button id="initialize-btn">Initialize Payment Form</button>
@@ -386,6 +399,10 @@ struct RootPayWebView: UIViewRepresentable {
             
             <!-- 🎯 Load RootPay SDK directly in JavaScript -->
             <script>
+                /**
+                * Handle Flow Type
+                */
+
                 // Load SDK dynamically and set up API debugging
                 (function() {
                     console.log('📦 Starting RootPay SDK loading process...');
@@ -505,7 +522,10 @@ struct RootPayWebView: UIViewRepresentable {
                     
                     // Now load the SDK
                     const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js';
+        
+                    const versionTag = Date.now(); // Creating new url everytime to bust the cache, ios aggresive src.
+                    script.src = `https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js?v=${versionTag}`;
+        
                     script.onload = function() {
                         console.log('✅ RootPay SDK loaded successfully!');
                         initializeApp();
@@ -539,7 +559,8 @@ struct RootPayWebView: UIViewRepresentable {
                         confirmAccountNumber: false
                     },
                     submitInProgress: false,
-                    validationTimeout: null
+                    validationTimeout: null,
+                    userType: "payee",
                 };
                 
                 // Initialize app after SDK loads
@@ -572,14 +593,34 @@ struct RootPayWebView: UIViewRepresentable {
                             if (state.paymentType === 'card') {
                                 document.getElementById('card-fields').classList.remove('hidden');
                                 document.getElementById('bank-fields').classList.add('hidden');
-                                createCardFields();
+        
+                                // Wait for dom element to be painted
+                                setTimeout(createCardFields, 1000);
                             } else {
                                 document.getElementById('card-fields').classList.add('hidden');
                                 document.getElementById('bank-fields').classList.remove('hidden');
-                                createBankFields();
+        
+                                // Wait for dom element to be painted
+                                setTimeout(createBankFields, 1000);
                             }
                             
                             updateSubmitButtonState();
+                        });
+                    });
+
+                    document.querySelectorAll('input[name="user-type"]').forEach((radio) => {
+        
+                        radio.addEventListener("change", function (e) {
+                                state.userType = e.target.value;
+                                const partyId = document.getElementById('party-id')
+
+                                                if (state.userType === "payee") {
+                                                    partyId.placeholder = "Enter Payee Id";
+                                                } else {
+                                                    partyId.placeholder = "Enter Payer Id";
+                                                }
+        
+                                    updateSubmitButtonState();
                         });
                     });
                     
@@ -591,25 +632,29 @@ struct RootPayWebView: UIViewRepresentable {
                     console.log('🎯 Initializing RootPay...');
                     
                     const token = document.getElementById('token').value.trim();
-                    const payeeId = document.getElementById('payee-id').value.trim();
+                    const partyId = document.getElementById('party-id').value.trim();
                     
-                    if (!token || !payeeId) {
-                        showStatus('Please enter valid token and payee ID', 'error');
+                    if (!token || !partyId) {
+                        showStatus(`Please enter valid token and ${state.userType} ID`, 'error');
                         return;
                     }
                     
                     const initConfig = {
                         token: token,
-                        payee_id: payeeId,
                         debug: true
                     };
+
+                    if (state.userType === "payee") {
+                        initConfig.payee_id = partyId;
+                    } else if (state.userType === "payer") {
+                        initConfig.payer_id = partyId;
+                    }
+
                     console.log('🔧 Configuration:', JSON.stringify(initConfig, null, 2));
                     
                     try {
-                        state.rootpay = RootPay.init({
-                            token: token,
-                            payee_id: payeeId,
-                            debug: true,
+                        const options = {
+                            ...initConfig,
                             onSuccess: function(response) {
                                 if (state.submitInProgress) {
                                     showStatus('Payment method added successfully!', 'success');
@@ -624,15 +669,35 @@ struct RootPayWebView: UIViewRepresentable {
                                 console.log('💳 Payment methods updated:', paymentMethods);
                                 displayPaymentMethods(paymentMethods);
                             }
-                        });
+                        };
+        
+                        state.rootpay = RootPay.init(state.userType, options);
                         
                         console.log('✅ RootPay initialized - ALL API calls should now use localhost:8000');
                         
-                        // Create fields and show form
-                        createCardFields();
-                        document.getElementById('setup-form').classList.add('hidden');
-                        document.getElementById('payment-form').classList.remove('hidden');
+                        // Create initial card fields
+                        if (state.userType === "payer") {
+                            document.getElementById('payment-form').classList.remove('hidden');
+        
+                            const bankBtn = document
+                                .querySelector('input[name="payment-type"][value="bank"]')
+
+                            if (bankBtn) {
+                                bankBtn.checked = true;
+                                ['input', 'change', 'click'].forEach(evt =>
+                                    bankBtn.dispatchEvent(new Event(evt, { bubbles: true }))
+                                );
+                            }
+        
+                            const el = document.querySelector('.payment-type');
+                            el.style.display = 'none';
+                        } else {
+                            // Wait for dom element to be painted
+                            setTimeout(createCardFields, 1000)
+                        }
                         
+                        document.getElementById('payment-form').classList.remove('hidden');
+                        document.getElementById('setup-form').classList.add('hidden');            
                     } catch (error) {
                         console.error('💥 RootPay initialization error:', error);
                         showStatus('Failed to initialize: ' + error.message, 'error');
@@ -744,14 +809,14 @@ struct RootPayWebView: UIViewRepresentable {
                     showStatus('Processing...', 'info');
                     state.submitInProgress = true;
                     
-                    state.rootpay.submitPaymentMethod(function(status, response) {
-                        console.log('📤 Submission result:', status, response);
+                    state.rootpay.submitPaymentMethod(function(error, response) {
+                        console.log('📤 Submission result:', error, response);
                         
-                        if (status === 201) {
+                        if (response) {
                             showStatus('Payment method added successfully!', 'success');
                             loadPaymentMethods();
                         } else {
-                            const errorMessage = response.error || 'Unknown error';
+                            const errorMessage = error.message || 'Unknown error';
                             showStatus(`Error ${status}: ${errorMessage}`, 'error');
                         }
                         
@@ -781,25 +846,33 @@ struct RootPayWebView: UIViewRepresentable {
                     });
                 }
                 
-                // Display payment methods
-                function displayPaymentMethods(paymentMethods) {
-                    const container = document.getElementById('payment-methods-list');
-                    
-                    if (!paymentMethods || paymentMethods.length === 0) {
-                        container.innerHTML = '<p>No payment methods available.</p>';
-                        return;
-                    }
-                    
-                    let html = '';
-                    paymentMethods.forEach(method => {
-                        if (method.card_last_four) {
-                            html += `<div class="payment-method">Credit Card •••• ${method.card_last_four}</div>`;
-                        } else if (method.account_last_four) {
-                            html += `<div class="payment-method">Bank Account •••• ${method.account_last_four}</div>`;
-                        }
-                    });
-                    
-                    container.innerHTML = html;
+                function displayPaymentMethods(response) {
+                  const list = response?.data ?? [];
+                  const container = document.getElementById('payment-methods-list');
+
+                  if (!container) {
+                    console.warn('⚠️ payment-methods-list element not found');
+                    return;
+                  }
+
+                  if (list.length === 0) {
+                    container.innerHTML = '<p>No payment methods available.</p>';
+                    return;
+                  }
+
+                  const html = list.map(method => {
+                    const isDefault = method.is_default ? ' (Default)' : '';
+                    const type = method.card_last_four ? 'Credit Card' : 'Bank Account';
+                    const lastFour = method.card_last_four || method.account_last_four;
+
+                    return `
+                      <div class="payment-method">
+                        ${type} •••• ${lastFour}${isDefault}
+                      </div>
+                    `;
+                  }).join('');
+
+                  container.innerHTML = html;
                 }
                 
                 // Update submit button state with debouncing and validation stability check
