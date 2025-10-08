@@ -60,7 +60,7 @@ Refer to the official documentation at https://docs.root.credit for details on g
 ### Initialization
 
 ```javascript
-RootPay.init(userType, options)
+RootPay.init(userType, options);
 ```
 
 **Parameters:**
@@ -71,8 +71,6 @@ RootPay.init(userType, options)
   - `payer_id` (String): Payer ID (when userType is "payer")
   - `apiBaseUrl` (String, optional): Override the API URL
   - `debug` (Boolean, optional): Enable detailed logging (default: false)
-  - `onSuccess` (Function): Callback for successful payment method creation
-  - `onError` (Function): Callback for payment method creation errors
 
 **Returns:** RootPay instance
 
@@ -82,15 +80,13 @@ const sdk = window.RootPay.init("payee", {
   token: "your-session-token",
   payee_id: "your-payee-id",
   debug: true,
-  onSuccess: (response) => console.log("Success:", response),
-  onError: (error) => console.error("Error:", error)
 });
 ```
 
 ### Field Creation
 
 ```javascript
-rootpay.field(selector, options)
+rootpay.field(selector, options);
 ```
 
 **Parameters:**
@@ -105,7 +101,7 @@ rootpay.field(selector, options)
 ### Payment Method Management
 
 ```javascript
-rootpay.submitPaymentMethod(callback, type, options)
+rootpay.submitPaymentMethod(callback, type, options);
 ```
 
 **Parameters:**
@@ -118,28 +114,25 @@ rootpay.submitPaymentMethod(callback, type, options)
 
 **Example:**
 ```javascript
-sdk.submitPaymentMethod((error, response) => {
-  if (error) {
-    console.error("Submission failed:", error);
-  } else {
-    console.log("Payment method submitted:", response);
-  }
-}, 'card', { isDefault: true });
+sdk.submitPaymentMethod(
+  (error, response) => {
+    if (error) {
+      console.error("Submission failed:", error);
+    } else {
+      console.log("Payment method submitted:", response);
+    }
+  },
+  "card",
+  { isDefault: true }
+);
 ```
 
 ### Utility Methods
 
-```javascript
-rootpay.getFormState()
-```
-
-**Returns:**
-- `getFormState()`: Current form state object including field validities.
-
 ### Payment Methods Management
 
 ```javascript
-rootpay.getPaymentMethods(callback, options)
+rootpay.getPaymentMethods(callback, options);
 ```
 
 **Parameters:**
