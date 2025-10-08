@@ -251,15 +251,6 @@
                 state.validation.routingNumber &&
                 state.validation.confirmAccountNumber;
 
-          console.log(
-            "::current isValid is ",
-            isValid,
-            JSON.stringify(state),
-            state.validation.cardNumber,
-            state.validation.cardExpiry,
-            state.validation.confirmCardNumber
-          );
-
           // Only change button state if it's different from current state
           const currentlyDisabled = elements.paymentButton.disabled;
           const shouldBeDisabled = !isValid;
@@ -405,7 +396,6 @@
               style: defaultStyles.cardNumber,
               placeholder: "Re-enter card number",
               onValidChange: function (isValid) {
-                console.log("::I was called, I have to update valid state");
                 state.validation.confirmCardNumber = isValid;
                 updateSubmitButtonState();
               },
