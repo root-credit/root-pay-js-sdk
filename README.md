@@ -13,6 +13,7 @@ A secure JavaScript SDK for collecting payment information without sensitive dat
 ## Installation
 
 ### Production Use (CDN)
+
 For production use, include RootPay directly from the jsDelivr CDN:
 
 ```html
@@ -53,7 +54,7 @@ We provide sample integration demos that you can use to test the SDK with your R
 
 For test card transactions, you can use the number `4111 1111 1111 1111` with any future expiry date.
 
-Refer to the official documentation at https://docs.root.credit for details on generating session tokens and verifying your test transactions.
+Refer to the official documentation at https://docs.useroot.com for details on generating session tokens and verifying your test transactions.
 
 ## API Reference
 
@@ -64,6 +65,7 @@ RootPay.init(userType, options);
 ```
 
 **Parameters:**
+
 - `userType` (String): User type - either `"payee"` or `"payer"` to set the correct ID
 - `options` (Object):
   - `token` (String): RootPay session token
@@ -75,6 +77,7 @@ RootPay.init(userType, options);
 **Returns:** RootPay instance
 
 **Example:**
+
 ```javascript
 const sdk = window.RootPay.init("payee", {
   token: "your-session-token",
@@ -90,6 +93,7 @@ rootpay.field(selector, options);
 ```
 
 **Parameters:**
+
 - `selector` (String): CSS selector for the container element
 - `options` (Object):
   - `type` (String): Field type ('card-number', 'card-expiry', 'routing-number', 'account-number')
@@ -105,6 +109,7 @@ rootpay.submitPaymentMethod(callback, type, options);
 ```
 
 **Parameters:**
+
 - `callback` (Function): Callback function with parameters:
   - `error` (Object|null): Error object if submission fails, null on success
   - `response` (Object): Response data
@@ -113,6 +118,7 @@ rootpay.submitPaymentMethod(callback, type, options);
   - `isDefault` (Boolean, optional): Whether this payment method should be set as default (default: true)
 
 **Example:**
+
 ```javascript
 sdk.submitPaymentMethod(
   (error, response) => {
@@ -136,6 +142,7 @@ rootpay.getPaymentMethods(callback, options);
 ```
 
 **Parameters:**
+
 - `callback` (Function, optional): Callback function with parameters:
   - `error` (Object|null): Error object if the fetch fails, null on success
   - `paymentMethods` (Array): Array of payment method objects
@@ -146,5 +153,6 @@ rootpay.getPaymentMethods(callback, options);
   - `cursor` (String): Cursor for fetching the next page of results
 
 **Returns:**
+
 - When called without a callback: Array of current payment methods (synchronous use)
 - When called with a callback: Fetches latest payment methods from server (asynchronous use)
