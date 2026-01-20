@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RootPay Integration</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" crossorigin href="styles.css" />
   </head>
   <body>
     <div class="container">
@@ -29,15 +29,23 @@
             type="text"
             id="token"
             placeholder="Enter your RootPay session token"
+            data-testid="token"
           />
         </div>
 
         <div class="form-group party-group">
           <label for="party-id">Party ID:</label>
-          <input type="text" id="party-id" placeholder="Enter Payee Id" />
+          <input
+            type="text"
+            id="party-id"
+            placeholder="Enter Payee Id"
+            data-testid="party"
+          />
         </div>
 
-        <button id="initialize-btn">Initialize Payment Form</button>
+        <button id="initialize-btn" data-testid="initialize-btn">
+          Initialize Payment Form
+        </button>
       </div>
 
       <!-- Main UI (initially hidden) -->
@@ -64,30 +72,56 @@
 
           <div id="card-fields">
             <label for="card-number-container">Card Number</label>
-            <div id="card-number-container" class="secure-field"></div>
+            <div
+              id="card-number-container"
+              class="secure-field"
+              data-testid="card-number"
+            ></div>
             <label for="confirm-card-number-container"
               >Confirm Card Number</label
             >
-            <div id="confirm-card-number-container" class="secure-field"></div>
+            <div
+              id="confirm-card-number-container"
+              class="secure-field"
+              data-testid="confirm-card-number"
+            ></div>
             <label for="card-expiry-container">Expiry Date</label>
-            <div id="card-expiry-container" class="secure-field"></div>
+            <div
+              id="card-expiry-container"
+              class="secure-field"
+              data-testid="expiry-date"
+            ></div>
           </div>
 
           <div id="bank-fields" style="display: none">
             <label for="account-number-container">Account Number</label>
-            <div id="account-number-container" class="secure-field"></div>
+            <div
+              id="account-number-container"
+              class="secure-field"
+              data-testid="account-number"
+            ></div>
             <label for="confirm-account-number-container"
               >Confirm Account Number</label
             >
             <div
               id="confirm-account-number-container"
               class="secure-field"
+              data-testid="confirm-account-number"
             ></div>
             <label for="routing-number-container">Routing Number</label>
-            <div id="routing-number-container" class="secure-field"></div>
+            <div
+              id="routing-number-container"
+              class="secure-field"
+              data-testid="routing-number"
+            ></div>
           </div>
 
-          <button id="payment-button" class="submit-button" disabled>
+          <button
+            id="payment-button"
+            class="submit-button"
+            disabled
+            data-testid="add-payment-method"
+          >
             Add Payment Method
           </button>
         </div>
@@ -120,8 +154,8 @@
           <li>
             Generate a session token using the token endpoint (see documentation
             at
-            <a href="https://docs.root.credit" target="_blank"
-              >docs.root.credit</a
+            <a href="https://docs.useroot.com" target="_blank"
+              >docs.useroot.com</a
             >)
           </li>
         </ol>
@@ -154,6 +188,7 @@
 
     <!-- Include the RootPay SDK -->
     <script src="https://cdn.jsdelivr.net/gh/root-credit/root-pay-js-sdk@latest/rootpay.min.js"></script>
+
     <script>
       // ===================================================
       // DOM ELEMENTS & STATE
@@ -174,7 +209,7 @@
         // Payment methods elements
         paymentMethodsList: document.getElementById("payment-methods-list"),
         refreshPaymentMethodsBtn: document.getElementById(
-          "refresh-payment-methods"
+          "refresh-payment-methods",
         ),
         paymentMethodsStatus: document.getElementById("payment-methods-status"),
         paymentType: document.querySelector(".payment-type-selector"),
@@ -264,7 +299,7 @@
 
             console.log(
               "Form validation (debounced):",
-              isValid ? "Valid" : "Invalid"
+              isValid ? "Valid" : "Invalid",
             );
           }
         }, 50); // Shorter delay for web version
@@ -351,7 +386,7 @@
           elements.responseDetails.textContent = JSON.stringify(
             response,
             null,
-            2
+            2,
           );
           elements.responseDetails.classList.remove("error");
           elements.responseDetails.classList.add("success");
@@ -383,7 +418,7 @@
                 state.validation.cardNumber = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
 
@@ -399,7 +434,7 @@
                 state.validation.confirmCardNumber = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
 
@@ -414,7 +449,7 @@
                 state.validation.cardExpiry = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
       }
@@ -434,7 +469,7 @@
                 state.validation.accountNumber = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
 
@@ -450,7 +485,7 @@
                 state.validation.confirmAccountNumber = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
 
@@ -465,7 +500,7 @@
                 state.validation.routingNumber = isValid;
                 updateSubmitButtonState();
               },
-            }
+            },
           );
         }
       }
@@ -534,7 +569,7 @@
             supportedRails = `<div class="supported-rails">
             ${method.supported_rails
               .map(
-                (rail) => `<span class="rail">${formatRailName(rail)}</span>`
+                (rail) => `<span class="rail">${formatRailName(rail)}</span>`,
               )
               .join("")}
           </div>`;
@@ -551,7 +586,7 @@
             <div class="payment-method-details">
               <div class="payment-method-header">
                 <div class="payment-method-type">${formatPaymentType(
-                  paymentType
+                  paymentType,
                 )}</div>
                 ${defaultIndicator}
                 ${verificationBadge}
@@ -627,7 +662,7 @@
           if (error) {
             showPaymentMethodsStatus(
               "Error refreshing payment methods: " + error.message,
-              "error"
+              "error",
             );
           } else {
             // Only show a status message if this was a manual refresh (button click)
@@ -660,10 +695,10 @@
             state.refreshInProgress
               ? "explicit refresh"
               : state.submitInProgress
-              ? "after submission"
-              : state.initializing
-              ? "during initialization"
-              : "first update"
+                ? "after submission"
+                : state.initializing
+                  ? "during initialization"
+                  : "first update",
           );
 
           state.lastPaymentMethodsUpdate = Date.now();
@@ -679,7 +714,7 @@
           } else {
             console.error(
               "Invalid payment methods data format:",
-              paymentMethods
+              paymentMethods,
             );
             // Handle the case where data format is incorrect
             elements.paymentMethodsList.innerHTML =
@@ -719,6 +754,7 @@
           const options = {
             token: token,
             debug: true,
+            apiBaseUrl: "https://api.useroot.com",
             onSuccess: function (response) {
               // Only show success message for payment method submission
               // This callback will be triggered by other successful operations too,
@@ -887,7 +923,7 @@
         elements.paymentButton.addEventListener("click", submitPaymentMethod);
         elements.refreshPaymentMethodsBtn.addEventListener(
           "click",
-          refreshPaymentMethods
+          refreshPaymentMethods,
         );
 
         // Payment method selection
